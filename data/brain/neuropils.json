@@ -1,0 +1,886 @@
+{
+  "rois": [
+    {
+      "name": "AB(L)",
+      "file": "rois/AB_L.obj",
+      "color": "#F0E68C",
+      "region": "brain"
+    },
+    {
+      "name": "AB(R)",
+      "file": "rois/AB_R.obj",
+      "color": "#F0E68C",
+      "region": "brain"
+    },
+    {
+      "name": "ADMN(L)",
+      "file": "rois/ADMN_L.obj",
+      "color": "#8B5CF6",
+      "region": "vnc"
+    },
+    {
+      "name": "ADMN(R)",
+      "file": "rois/ADMN_R.obj",
+      "color": "#8B5CF6",
+      "region": "vnc"
+    },
+    {
+      "name": "AL(L)",
+      "file": "rois/AL_L.obj",
+      "color": "#FFD700",
+      "region": "brain"
+    },
+    {
+      "name": "AL(R)",
+      "file": "rois/AL_R.obj",
+      "color": "#FFD700",
+      "region": "brain"
+    },
+    {
+      "name": "AME(L)",
+      "file": "rois/AME_L.obj",
+      "color": "#6495ED",
+      "region": "brain"
+    },
+    {
+      "name": "AME(R)",
+      "file": "rois/AME_R.obj",
+      "color": "#6495ED",
+      "region": "brain"
+    },
+    {
+      "name": "AMMC(L)",
+      "file": "rois/AMMC_L.obj",
+      "color": "#FF8C69",
+      "region": "brain"
+    },
+    {
+      "name": "AMMC(R)",
+      "file": "rois/AMMC_R.obj",
+      "color": "#FF8C69",
+      "region": "brain"
+    },
+    {
+      "name": "ANm",
+      "file": "rois/ANm.obj",
+      "color": "#D4944C",
+      "region": "brain"
+    },
+    {
+      "name": "AOTU(L)",
+      "file": "rois/AOTU_L.obj",
+      "color": "#FF7F50",
+      "region": "brain"
+    },
+    {
+      "name": "AOTU(R)",
+      "file": "rois/AOTU_R.obj",
+      "color": "#FF7F50",
+      "region": "brain"
+    },
+    {
+      "name": "ATL(L)",
+      "file": "rois/ATL_L.obj",
+      "color": "#F08080",
+      "region": "brain"
+    },
+    {
+      "name": "ATL(R)",
+      "file": "rois/ATL_R.obj",
+      "color": "#F08080",
+      "region": "brain"
+    },
+    {
+      "name": "AVLP(L)",
+      "file": "rois/AVLP_L.obj",
+      "color": "#F4A460",
+      "region": "brain"
+    },
+    {
+      "name": "AVLP(R)",
+      "file": "rois/AVLP_R.obj",
+      "color": "#F4A460",
+      "region": "brain"
+    },
+    {
+      "name": "AbN1(L)",
+      "file": "rois/AbN1_L.obj",
+      "color": "#D946EF",
+      "region": "vnc"
+    },
+    {
+      "name": "AbN1(R)",
+      "file": "rois/AbN1_R.obj",
+      "color": "#D946EF",
+      "region": "vnc"
+    },
+    {
+      "name": "AbN2(L)",
+      "file": "rois/AbN2_L.obj",
+      "color": "#D946EF",
+      "region": "vnc"
+    },
+    {
+      "name": "AbN2(R)",
+      "file": "rois/AbN2_R.obj",
+      "color": "#D946EF",
+      "region": "vnc"
+    },
+    {
+      "name": "AbN3(L)",
+      "file": "rois/AbN3_L.obj",
+      "color": "#D946EF",
+      "region": "vnc"
+    },
+    {
+      "name": "AbN3(R)",
+      "file": "rois/AbN3_R.obj",
+      "color": "#D946EF",
+      "region": "vnc"
+    },
+    {
+      "name": "AbN4(L)",
+      "file": "rois/AbN4_L.obj",
+      "color": "#D946EF",
+      "region": "vnc"
+    },
+    {
+      "name": "AbN4(R)",
+      "file": "rois/AbN4_R.obj",
+      "color": "#D946EF",
+      "region": "vnc"
+    },
+    {
+      "name": "AbNT(L)",
+      "file": "rois/AbNT_L.obj",
+      "color": "#D946EF",
+      "region": "vnc"
+    },
+    {
+      "name": "AbNT(R)",
+      "file": "rois/AbNT_R.obj",
+      "color": "#D946EF",
+      "region": "vnc"
+    },
+    {
+      "name": "BU(L)",
+      "file": "rois/BU_L.obj",
+      "color": "#FF7F50",
+      "region": "brain"
+    },
+    {
+      "name": "BU(R)",
+      "file": "rois/BU_R.obj",
+      "color": "#FF7F50",
+      "region": "brain"
+    },
+    {
+      "name": "CA(L)",
+      "file": "rois/CA_L.obj",
+      "color": "#FF8844",
+      "region": "brain"
+    },
+    {
+      "name": "CA(R)",
+      "file": "rois/CA_R.obj",
+      "color": "#FF8844",
+      "region": "brain"
+    },
+    {
+      "name": "CAN(L)",
+      "file": "rois/CAN_L.obj",
+      "color": "#FF4500",
+      "region": "brain"
+    },
+    {
+      "name": "CAN(R)",
+      "file": "rois/CAN_R.obj",
+      "color": "#FF4500",
+      "region": "brain"
+    },
+    {
+      "name": "CRE(L)",
+      "file": "rois/CRE_L.obj",
+      "color": "#FA8072",
+      "region": "brain"
+    },
+    {
+      "name": "CRE(R)",
+      "file": "rois/CRE_R.obj",
+      "color": "#FA8072",
+      "region": "brain"
+    },
+    {
+      "name": "CvN(L)",
+      "file": "rois/CvN_L.obj",
+      "color": "#DA70D6",
+      "region": "vnc"
+    },
+    {
+      "name": "CvN(R)",
+      "file": "rois/CvN_R.obj",
+      "color": "#DA70D6",
+      "region": "vnc"
+    },
+    {
+      "name": "DMetaN(L)",
+      "file": "rois/DMetaN_L.obj",
+      "color": "#BA55D3",
+      "region": "vnc"
+    },
+    {
+      "name": "DMetaN(R)",
+      "file": "rois/DMetaN_R.obj",
+      "color": "#BA55D3",
+      "region": "vnc"
+    },
+    {
+      "name": "DProN(L)",
+      "file": "rois/DProN_L.obj",
+      "color": "#9932CC",
+      "region": "vnc"
+    },
+    {
+      "name": "DProN(R)",
+      "file": "rois/DProN_R.obj",
+      "color": "#9932CC",
+      "region": "vnc"
+    },
+    {
+      "name": "EB",
+      "file": "rois/EB.obj",
+      "color": "#FF6347",
+      "region": "brain"
+    },
+    {
+      "name": "EPA(L)",
+      "file": "rois/EPA_L.obj",
+      "color": "#FFDAB9",
+      "region": "brain"
+    },
+    {
+      "name": "EPA(R)",
+      "file": "rois/EPA_R.obj",
+      "color": "#FFDAB9",
+      "region": "brain"
+    },
+    {
+      "name": "FB",
+      "file": "rois/FB.obj",
+      "color": "#FF8C00",
+      "region": "brain"
+    },
+    {
+      "name": "FLA(L)",
+      "file": "rois/FLA_L.obj",
+      "color": "#FF6347",
+      "region": "brain"
+    },
+    {
+      "name": "FLA(R)",
+      "file": "rois/FLA_R.obj",
+      "color": "#FF6347",
+      "region": "brain"
+    },
+    {
+      "name": "GA(L)",
+      "file": "rois/GA_L.obj",
+      "color": "#FFB347",
+      "region": "brain"
+    },
+    {
+      "name": "GA(R)",
+      "file": "rois/GA_R.obj",
+      "color": "#FFB347",
+      "region": "brain"
+    },
+    {
+      "name": "GNG",
+      "file": "rois/GNG.obj",
+      "color": "#B8860B",
+      "region": "brain"
+    },
+    {
+      "name": "GOR(L)",
+      "file": "rois/GOR_L.obj",
+      "color": "#FFE4B5",
+      "region": "brain"
+    },
+    {
+      "name": "GOR(R)",
+      "file": "rois/GOR_R.obj",
+      "color": "#FFE4B5",
+      "region": "brain"
+    },
+    {
+      "name": "HTct(UTct-T3)(L)",
+      "file": "rois/HTct_UTct-T3_L.obj",
+      "color": "#C0A060",
+      "region": "brain"
+    },
+    {
+      "name": "HTct(UTct-T3)(R)",
+      "file": "rois/HTct_UTct-T3_R.obj",
+      "color": "#C0A060",
+      "region": "brain"
+    },
+    {
+      "name": "IB",
+      "file": "rois/IB.obj",
+      "color": "#BC8F8F",
+      "region": "brain"
+    },
+    {
+      "name": "ICL(L)",
+      "file": "rois/ICL_L.obj",
+      "color": "#BDB76B",
+      "region": "brain"
+    },
+    {
+      "name": "ICL(R)",
+      "file": "rois/ICL_R.obj",
+      "color": "#BDB76B",
+      "region": "brain"
+    },
+    {
+      "name": "IPS(L)",
+      "file": "rois/IPS_L.obj",
+      "color": "#C0A060",
+      "region": "brain"
+    },
+    {
+      "name": "IPS(R)",
+      "file": "rois/IPS_R.obj",
+      "color": "#C0A060",
+      "region": "brain"
+    },
+    {
+      "name": "IntTct",
+      "file": "rois/IntTct.obj",
+      "color": "#B8960A",
+      "region": "brain"
+    },
+    {
+      "name": "LA(L)",
+      "file": "rois/LA_L.obj",
+      "color": "#87CEEB",
+      "region": "brain"
+    },
+    {
+      "name": "LA(R)",
+      "file": "rois/LA_R.obj",
+      "color": "#87CEEB",
+      "region": "brain"
+    },
+    {
+      "name": "LAL(L)",
+      "file": "rois/LAL_L.obj",
+      "color": "#87CEEB",
+      "region": "brain"
+    },
+    {
+      "name": "LAL(R)",
+      "file": "rois/LAL_R.obj",
+      "color": "#87CEEB",
+      "region": "brain"
+    },
+    {
+      "name": "LH(L)",
+      "file": "rois/LH_L.obj",
+      "color": "#FF4444",
+      "region": "brain"
+    },
+    {
+      "name": "LH(R)",
+      "file": "rois/LH_R.obj",
+      "color": "#FF4444",
+      "region": "brain"
+    },
+    {
+      "name": "LO(L)",
+      "file": "rois/LO_L.obj",
+      "color": "#00CED1",
+      "region": "brain"
+    },
+    {
+      "name": "LO(R)",
+      "file": "rois/LO_R.obj",
+      "color": "#00CED1",
+      "region": "brain"
+    },
+    {
+      "name": "LOP(L)",
+      "file": "rois/LOP_L.obj",
+      "color": "#20B2AA",
+      "region": "brain"
+    },
+    {
+      "name": "LOP(R)",
+      "file": "rois/LOP_R.obj",
+      "color": "#20B2AA",
+      "region": "brain"
+    },
+    {
+      "name": "LTct",
+      "file": "rois/LTct.obj",
+      "color": "#A08030",
+      "region": "brain"
+    },
+    {
+      "name": "LegNp(T1)(L)",
+      "file": "rois/LegNp_T1_L.obj",
+      "color": "#E8A040",
+      "region": "brain"
+    },
+    {
+      "name": "LegNp(T1)(R)",
+      "file": "rois/LegNp_T1_R.obj",
+      "color": "#E8A040",
+      "region": "brain"
+    },
+    {
+      "name": "LegNp(T2)(L)",
+      "file": "rois/LegNp_T2_L.obj",
+      "color": "#E8A040",
+      "region": "brain"
+    },
+    {
+      "name": "LegNp(T2)(R)",
+      "file": "rois/LegNp_T2_R.obj",
+      "color": "#E8A040",
+      "region": "brain"
+    },
+    {
+      "name": "LegNp(T3)(L)",
+      "file": "rois/LegNp_T3_L.obj",
+      "color": "#D4944C",
+      "region": "brain"
+    },
+    {
+      "name": "LegNp(T3)(R)",
+      "file": "rois/LegNp_T3_R.obj",
+      "color": "#D4944C",
+      "region": "brain"
+    },
+    {
+      "name": "ME(L)",
+      "file": "rois/ME_L.obj",
+      "color": "#4169E1",
+      "region": "brain"
+    },
+    {
+      "name": "ME(R)",
+      "file": "rois/ME_R.obj",
+      "color": "#4169E1",
+      "region": "brain"
+    },
+    {
+      "name": "MesoAN(L)",
+      "file": "rois/MesoAN_L.obj",
+      "color": "#8B008B",
+      "region": "vnc"
+    },
+    {
+      "name": "MesoAN(R)",
+      "file": "rois/MesoAN_R.obj",
+      "color": "#8B008B",
+      "region": "vnc"
+    },
+    {
+      "name": "MesoLN(L)",
+      "file": "rois/MesoLN_L.obj",
+      "color": "#9400D3",
+      "region": "vnc"
+    },
+    {
+      "name": "MesoLN(R)",
+      "file": "rois/MesoLN_R.obj",
+      "color": "#9400D3",
+      "region": "vnc"
+    },
+    {
+      "name": "MetaLN(L)",
+      "file": "rois/MetaLN_L.obj",
+      "color": "#800080",
+      "region": "vnc"
+    },
+    {
+      "name": "MetaLN(R)",
+      "file": "rois/MetaLN_R.obj",
+      "color": "#800080",
+      "region": "vnc"
+    },
+    {
+      "name": "NO",
+      "file": "rois/NO.obj",
+      "color": "#FFD700",
+      "region": "brain"
+    },
+    {
+      "name": "NTct(UTct-T1)(L)",
+      "file": "rois/NTct_UTct-T1_L.obj",
+      "color": "#D0B070",
+      "region": "brain"
+    },
+    {
+      "name": "NTct(UTct-T1)(R)",
+      "file": "rois/NTct_UTct-T1_R.obj",
+      "color": "#D0B070",
+      "region": "brain"
+    },
+    {
+      "name": "Ov(L)",
+      "file": "rois/Ov_L.obj",
+      "color": "#DEB887",
+      "region": "brain"
+    },
+    {
+      "name": "Ov(R)",
+      "file": "rois/Ov_R.obj",
+      "color": "#DEB887",
+      "region": "brain"
+    },
+    {
+      "name": "PB",
+      "file": "rois/PB.obj",
+      "color": "#FFA07A",
+      "region": "brain"
+    },
+    {
+      "name": "PDMN(L)",
+      "file": "rois/PDMN_L.obj",
+      "color": "#7C3AED",
+      "region": "vnc"
+    },
+    {
+      "name": "PDMN(R)",
+      "file": "rois/PDMN_R.obj",
+      "color": "#7C3AED",
+      "region": "vnc"
+    },
+    {
+      "name": "PED(L)",
+      "file": "rois/PED_L.obj",
+      "color": "#FF9955",
+      "region": "brain"
+    },
+    {
+      "name": "PED(R)",
+      "file": "rois/PED_R.obj",
+      "color": "#FF9955",
+      "region": "brain"
+    },
+    {
+      "name": "PLP(L)",
+      "file": "rois/PLP_L.obj",
+      "color": "#CC7722",
+      "region": "brain"
+    },
+    {
+      "name": "PLP(R)",
+      "file": "rois/PLP_R.obj",
+      "color": "#CC7722",
+      "region": "brain"
+    },
+    {
+      "name": "PRW",
+      "file": "rois/PRW.obj",
+      "color": "#FFECD2",
+      "region": "brain"
+    },
+    {
+      "name": "PVLP(L)",
+      "file": "rois/PVLP_L.obj",
+      "color": "#E9967A",
+      "region": "brain"
+    },
+    {
+      "name": "PVLP(R)",
+      "file": "rois/PVLP_R.obj",
+      "color": "#E9967A",
+      "region": "brain"
+    },
+    {
+      "name": "PrN(L)",
+      "file": "rois/PrN_L.obj",
+      "color": "#C71585",
+      "region": "vnc"
+    },
+    {
+      "name": "PrN(R)",
+      "file": "rois/PrN_R.obj",
+      "color": "#C71585",
+      "region": "vnc"
+    },
+    {
+      "name": "ProAN(L)",
+      "file": "rois/ProAN_L.obj",
+      "color": "#DB7093",
+      "region": "vnc"
+    },
+    {
+      "name": "ProAN(R)",
+      "file": "rois/ProAN_R.obj",
+      "color": "#DB7093",
+      "region": "vnc"
+    },
+    {
+      "name": "ProCN(L)",
+      "file": "rois/ProCN_L.obj",
+      "color": "#FF69B4",
+      "region": "vnc"
+    },
+    {
+      "name": "ProCN(R)",
+      "file": "rois/ProCN_R.obj",
+      "color": "#FF69B4",
+      "region": "vnc"
+    },
+    {
+      "name": "ProLN(L)",
+      "file": "rois/ProLN_L.obj",
+      "color": "#FFB6C1",
+      "region": "vnc"
+    },
+    {
+      "name": "ProLN(R)",
+      "file": "rois/ProLN_R.obj",
+      "color": "#FFB6C1",
+      "region": "vnc"
+    },
+    {
+      "name": "ROB(L)",
+      "file": "rois/ROB_L.obj",
+      "color": "#FA8072",
+      "region": "brain"
+    },
+    {
+      "name": "ROB(R)",
+      "file": "rois/ROB_R.obj",
+      "color": "#FA8072",
+      "region": "brain"
+    },
+    {
+      "name": "RUB(L)",
+      "file": "rois/RUB_L.obj",
+      "color": "#FF6347",
+      "region": "brain"
+    },
+    {
+      "name": "RUB(R)",
+      "file": "rois/RUB_R.obj",
+      "color": "#FF6347",
+      "region": "brain"
+    },
+    {
+      "name": "SAD",
+      "file": "rois/SAD.obj",
+      "color": "#CD853F",
+      "region": "brain"
+    },
+    {
+      "name": "SCL(L)",
+      "file": "rois/SCL_L.obj",
+      "color": "#E0C068",
+      "region": "brain"
+    },
+    {
+      "name": "SCL(R)",
+      "file": "rois/SCL_R.obj",
+      "color": "#E0C068",
+      "region": "brain"
+    },
+    {
+      "name": "SIP(L)",
+      "file": "rois/SIP_L.obj",
+      "color": "#DEB887",
+      "region": "brain"
+    },
+    {
+      "name": "SIP(R)",
+      "file": "rois/SIP_R.obj",
+      "color": "#DEB887",
+      "region": "brain"
+    },
+    {
+      "name": "SLP(L)",
+      "file": "rois/SLP_L.obj",
+      "color": "#CD853F",
+      "region": "brain"
+    },
+    {
+      "name": "SLP(R)",
+      "file": "rois/SLP_R.obj",
+      "color": "#CD853F",
+      "region": "brain"
+    },
+    {
+      "name": "SMP(L)",
+      "file": "rois/SMP_L.obj",
+      "color": "#D2691E",
+      "region": "brain"
+    },
+    {
+      "name": "SMP(R)",
+      "file": "rois/SMP_R.obj",
+      "color": "#D2691E",
+      "region": "brain"
+    },
+    {
+      "name": "SPS(L)",
+      "file": "rois/SPS_L.obj",
+      "color": "#D2B48C",
+      "region": "brain"
+    },
+    {
+      "name": "SPS(R)",
+      "file": "rois/SPS_R.obj",
+      "color": "#D2B48C",
+      "region": "brain"
+    },
+    {
+      "name": "VES(L)",
+      "file": "rois/VES_L.obj",
+      "color": "#FFA500",
+      "region": "brain"
+    },
+    {
+      "name": "VES(R)",
+      "file": "rois/VES_R.obj",
+      "color": "#FFA500",
+      "region": "brain"
+    },
+    {
+      "name": "VProN(L)",
+      "file": "rois/VProN_L.obj",
+      "color": "#FF1493",
+      "region": "vnc"
+    },
+    {
+      "name": "VProN(R)",
+      "file": "rois/VProN_R.obj",
+      "color": "#FF1493",
+      "region": "vnc"
+    },
+    {
+      "name": "WED(L)",
+      "file": "rois/WED_L.obj",
+      "color": "#DAA520",
+      "region": "brain"
+    },
+    {
+      "name": "WED(R)",
+      "file": "rois/WED_R.obj",
+      "color": "#DAA520",
+      "region": "brain"
+    },
+    {
+      "name": "WTct(UTct-T2)(L)",
+      "file": "rois/WTct_UTct-T2_L.obj",
+      "color": "#C8A858",
+      "region": "brain"
+    },
+    {
+      "name": "WTct(UTct-T2)(R)",
+      "file": "rois/WTct_UTct-T2_R.obj",
+      "color": "#C8A858",
+      "region": "brain"
+    },
+    {
+      "name": "a'L(L)",
+      "file": "rois/a'L_L.obj",
+      "color": "#87CEEB",
+      "region": "brain"
+    },
+    {
+      "name": "a'L(R)",
+      "file": "rois/a'L_R.obj",
+      "color": "#87CEEB",
+      "region": "brain"
+    },
+    {
+      "name": "aL(L)",
+      "file": "rois/aL_L.obj",
+      "color": "#FFAA66",
+      "region": "brain"
+    },
+    {
+      "name": "aL(R)",
+      "file": "rois/aL_R.obj",
+      "color": "#FFAA66",
+      "region": "brain"
+    },
+    {
+      "name": "b'L(L)",
+      "file": "rois/b'L_L.obj",
+      "color": "#FFBB77",
+      "region": "brain"
+    },
+    {
+      "name": "b'L(R)",
+      "file": "rois/b'L_R.obj",
+      "color": "#FFBB77",
+      "region": "brain"
+    },
+    {
+      "name": "bL(L)",
+      "file": "rois/bL_L.obj",
+      "color": "#FFCC88",
+      "region": "brain"
+    },
+    {
+      "name": "bL(R)",
+      "file": "rois/bL_R.obj",
+      "color": "#FFCC88",
+      "region": "brain"
+    },
+    {
+      "name": "gL(L)",
+      "file": "rois/gL_L.obj",
+      "color": "#FFDD99",
+      "region": "brain"
+    },
+    {
+      "name": "gL(R)",
+      "file": "rois/gL_R.obj",
+      "color": "#FFDD99",
+      "region": "brain"
+    },
+    {
+      "name": "mVAC(T1)(L)",
+      "file": "rois/mVAC_T1_L.obj",
+      "color": "#D4944C",
+      "region": "brain"
+    },
+    {
+      "name": "mVAC(T1)(R)",
+      "file": "rois/mVAC_T1_R.obj",
+      "color": "#D4944C",
+      "region": "brain"
+    },
+    {
+      "name": "mVAC(T2)(L)",
+      "file": "rois/mVAC_T2_L.obj",
+      "color": "#D4944C",
+      "region": "brain"
+    },
+    {
+      "name": "mVAC(T2)(R)",
+      "file": "rois/mVAC_T2_R.obj",
+      "color": "#D4944C",
+      "region": "brain"
+    },
+    {
+      "name": "mVAC(T3)(L)",
+      "file": "rois/mVAC_T3_L.obj",
+      "color": "#D4944C",
+      "region": "brain"
+    },
+    {
+      "name": "mVAC(T3)(R)",
+      "file": "rois/mVAC_T3_R.obj",
+      "color": "#D4944C",
+      "region": "brain"
+    }
+  ]
+}

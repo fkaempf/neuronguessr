@@ -1,0 +1,1068 @@
+{
+  "count": 150,
+  "neurons": [
+    {
+      "file": "neuron_0.json",
+      "id": 25750,
+      "type": "PS096",
+      "region": "AMMC(R)",
+      "nodeCount": 969
+    },
+    {
+      "file": "neuron_1.json",
+      "id": 106434,
+      "type": "CB2719",
+      "region": "aL(R)",
+      "nodeCount": 533
+    },
+    {
+      "file": "neuron_2.json",
+      "id": 202114,
+      "type": "TuBu03",
+      "region": "BU(L)",
+      "nodeCount": 418
+    },
+    {
+      "file": "neuron_3.json",
+      "id": 27627,
+      "type": "L1",
+      "region": "ME(R)",
+      "nodeCount": 209
+    },
+    {
+      "file": "neuron_4.json",
+      "id": 809401,
+      "type": "MNad25",
+      "region": "AbN3(L)",
+      "nodeCount": 700
+    },
+    {
+      "file": "neuron_5.json",
+      "id": 803237,
+      "type": "Tergotr. MN",
+      "region": "VProN(L)",
+      "nodeCount": 2119
+    },
+    {
+      "file": "neuron_6.json",
+      "id": 556999,
+      "type": "AVLP755m",
+      "region": "SLP(L)",
+      "nodeCount": 826
+    },
+    {
+      "file": "neuron_7.json",
+      "id": 860788,
+      "type": "SNpp45",
+      "region": "LegNp(T1)(L)",
+      "nodeCount": 345
+    },
+    {
+      "file": "neuron_8.json",
+      "id": 827439,
+      "type": "SNta27",
+      "region": "MetaLN(R)",
+      "nodeCount": 67
+    },
+    {
+      "file": "neuron_9.json",
+      "id": 802835,
+      "type": "iii1 MN",
+      "region": "MesoAN(L)",
+      "nodeCount": 1042
+    },
+    {
+      "file": "neuron_10.json",
+      "id": 10502,
+      "type": "AOTU041",
+      "region": "BU(L)",
+      "nodeCount": 3207
+    },
+    {
+      "file": "neuron_11.json",
+      "id": 30088,
+      "type": "AN13B002",
+      "region": "ADMN(R)",
+      "nodeCount": 4432
+    },
+    {
+      "file": "neuron_12.json",
+      "id": 13181,
+      "type": "ANXXX027",
+      "region": "mVAC(T1)(L)",
+      "nodeCount": 4025
+    },
+    {
+      "file": "neuron_13.json",
+      "id": 10041,
+      "type": "OA-VUMa1",
+      "region": "GA(L)",
+      "nodeCount": 9455
+    },
+    {
+      "file": "neuron_14.json",
+      "id": 20233,
+      "type": "ExR7",
+      "region": "ROB(L)",
+      "nodeCount": 1119
+    },
+    {
+      "file": "neuron_15.json",
+      "id": 156892,
+      "type": "CB1876",
+      "region": "GOR(R)",
+      "nodeCount": 770
+    },
+    {
+      "file": "neuron_16.json",
+      "id": 566582,
+      "type": "WED131",
+      "region": "EPA(R)",
+      "nodeCount": 357
+    },
+    {
+      "file": "neuron_17.json",
+      "id": 23662,
+      "type": "CB3343",
+      "region": "IPS(L)",
+      "nodeCount": 760
+    },
+    {
+      "file": "neuron_18.json",
+      "id": 81047,
+      "type": "TuBu03",
+      "region": "BU(R)",
+      "nodeCount": 482
+    },
+    {
+      "file": "neuron_19.json",
+      "id": 38221,
+      "type": "CRE092",
+      "region": "SCL(L)",
+      "nodeCount": 904
+    },
+    {
+      "file": "neuron_20.json",
+      "id": 190208,
+      "type": "vDeltaM",
+      "region": "EB",
+      "nodeCount": 548
+    },
+    {
+      "file": "neuron_21.json",
+      "id": 811657,
+      "type": "IN12A061_c",
+      "region": "HTct(UTct-T3)(R)",
+      "nodeCount": 643
+    },
+    {
+      "file": "neuron_22.json",
+      "id": 91493,
+      "type": "KCab-s",
+      "region": "bL(R)",
+      "nodeCount": 282
+    },
+    {
+      "file": "neuron_23.json",
+      "id": 816975,
+      "type": "IN19A113",
+      "region": "MesoAN(R)",
+      "nodeCount": 486
+    },
+    {
+      "file": "neuron_24.json",
+      "id": 806348,
+      "type": "SNpp16",
+      "region": "ADMN(L)",
+      "nodeCount": 607
+    },
+    {
+      "file": "neuron_25.json",
+      "id": 29135,
+      "type": "PEN_b(PEN2)",
+      "region": "EB",
+      "nodeCount": 366
+    },
+    {
+      "file": "neuron_26.json",
+      "id": 826374,
+      "type": "LgLG2",
+      "region": "ProLN(R)",
+      "nodeCount": 177
+    },
+    {
+      "file": "neuron_27.json",
+      "id": 821654,
+      "type": "SNpp47",
+      "region": "mVAC(T2)(L)",
+      "nodeCount": 156
+    },
+    {
+      "file": "neuron_28.json",
+      "id": 579924,
+      "type": "WED081",
+      "region": "LAL(R)",
+      "nodeCount": 943
+    },
+    {
+      "file": "neuron_29.json",
+      "id": 10592,
+      "type": "AN08B012",
+      "region": "mVAC(T1)(R)",
+      "nodeCount": 3613
+    },
+    {
+      "file": "neuron_30.json",
+      "id": 10241,
+      "type": "AVLP001",
+      "region": "LH(R)",
+      "nodeCount": 13215
+    },
+    {
+      "file": "neuron_31.json",
+      "id": 807869,
+      "type": "IN18B041",
+      "region": "WTct(UTct-T2)(L)",
+      "nodeCount": 649
+    },
+    {
+      "file": "neuron_32.json",
+      "id": 524518,
+      "type": "AN01B002",
+      "region": "AbN4(L)",
+      "nodeCount": 4749
+    },
+    {
+      "file": "neuron_33.json",
+      "id": 159099,
+      "type": "CB4143",
+      "region": "CAN(L)",
+      "nodeCount": 842
+    },
+    {
+      "file": "neuron_34.json",
+      "id": 56766,
+      "type": "ICL010m",
+      "region": "SIP(L)",
+      "nodeCount": 866
+    },
+    {
+      "file": "neuron_35.json",
+      "id": 19570,
+      "type": "DNpe010",
+      "region": "SPS(L)",
+      "nodeCount": 1036
+    },
+    {
+      "file": "neuron_36.json",
+      "id": 10056,
+      "type": "DNg100",
+      "region": "LegNp(T1)(L)",
+      "nodeCount": 8063
+    },
+    {
+      "file": "neuron_37.json",
+      "id": 816200,
+      "type": "IN08A025",
+      "region": "ProAN(R)",
+      "nodeCount": 488
+    },
+    {
+      "file": "neuron_38.json",
+      "id": 10540,
+      "type": "APL",
+      "region": "AVLP(R)",
+      "nodeCount": 16515
+    },
+    {
+      "file": "neuron_39.json",
+      "id": 10185,
+      "type": "OA-VUMa8",
+      "region": "FB",
+      "nodeCount": 14076
+    },
+    {
+      "file": "neuron_40.json",
+      "id": 71017,
+      "type": "MeTu4d",
+      "region": "AOTU(R)",
+      "nodeCount": 278
+    },
+    {
+      "file": "neuron_41.json",
+      "id": 20132,
+      "type": "LHAV2b2_b",
+      "region": "AVLP(L)",
+      "nodeCount": 739
+    },
+    {
+      "file": "neuron_42.json",
+      "id": 75027,
+      "type": "Tm3",
+      "region": "LO(R)",
+      "nodeCount": 605
+    },
+    {
+      "file": "neuron_43.json",
+      "id": 805138,
+      "type": "IN11A014",
+      "region": "LegNp(T1)(L)",
+      "nodeCount": 982
+    },
+    {
+      "file": "neuron_44.json",
+      "id": 11389,
+      "type": "CB1074",
+      "region": "EPA(L)",
+      "nodeCount": 980
+    },
+    {
+      "file": "neuron_45.json",
+      "id": 800582,
+      "type": "INXXX032",
+      "region": "AbNT(R)",
+      "nodeCount": 3079
+    },
+    {
+      "file": "neuron_46.json",
+      "id": 189532,
+      "type": "SMP281",
+      "region": "SCL(L)",
+      "nodeCount": 537
+    },
+    {
+      "file": "neuron_47.json",
+      "id": 22121,
+      "type": "AVLP349",
+      "region": "AVLP(R)",
+      "nodeCount": 947
+    },
+    {
+      "file": "neuron_48.json",
+      "id": 519460,
+      "type": "DNa16",
+      "region": "DMetaN(L)",
+      "nodeCount": 2505
+    },
+    {
+      "file": "neuron_49.json",
+      "id": 163883,
+      "type": "PAM03",
+      "region": "b'L(R)",
+      "nodeCount": 964
+    },
+    {
+      "file": "neuron_50.json",
+      "id": 11403,
+      "type": "GNG641",
+      "region": "CvN(L)",
+      "nodeCount": 2495
+    },
+    {
+      "file": "neuron_51.json",
+      "id": 821730,
+      "type": "SNta02,SNta09",
+      "region": "PDMN(L)",
+      "nodeCount": 472
+    },
+    {
+      "file": "neuron_52.json",
+      "id": 821195,
+      "type": "IN21A096",
+      "region": "NTct(UTct-T1)(R)",
+      "nodeCount": 285
+    },
+    {
+      "file": "neuron_53.json",
+      "id": 12065,
+      "type": "aMe6c",
+      "region": "AME(L)",
+      "nodeCount": 525
+    },
+    {
+      "file": "neuron_54.json",
+      "id": 834952,
+      "type": "MNnm07,MNnm12",
+      "region": "DProN(R)",
+      "nodeCount": 486
+    },
+    {
+      "file": "neuron_55.json",
+      "id": 807696,
+      "type": "SNpp19",
+      "region": "PrN(L)",
+      "nodeCount": 240
+    },
+    {
+      "file": "neuron_56.json",
+      "id": 818384,
+      "type": "WG2",
+      "region": "ADMN(R)",
+      "nodeCount": 442
+    },
+    {
+      "file": "neuron_57.json",
+      "id": 914681,
+      "type": "SNxx21",
+      "region": "AbN3(L)",
+      "nodeCount": 487
+    },
+    {
+      "file": "neuron_58.json",
+      "id": 10025,
+      "type": "H2",
+      "region": "IPS(L)",
+      "nodeCount": 3385
+    },
+    {
+      "file": "neuron_59.json",
+      "id": 805863,
+      "type": "IN00A049",
+      "region": "LTct",
+      "nodeCount": 591
+    },
+    {
+      "file": "neuron_60.json",
+      "id": 155319080,
+      "type": "JO-C/D/E",
+      "region": "WED(L)",
+      "nodeCount": 149
+    },
+    {
+      "file": "neuron_61.json",
+      "id": 99847,
+      "type": "KCg-m",
+      "region": "gL(L)",
+      "nodeCount": 279
+    },
+    {
+      "file": "neuron_62.json",
+      "id": 63077,
+      "type": "SLP405_c",
+      "region": "SIP(R)",
+      "nodeCount": 869
+    },
+    {
+      "file": "neuron_63.json",
+      "id": 181584,
+      "type": "vDeltaA_a",
+      "region": "AB(R)",
+      "nodeCount": 680
+    },
+    {
+      "file": "neuron_64.json",
+      "id": 26843,
+      "type": "ER3w_b",
+      "region": "BU(R)",
+      "nodeCount": 746
+    },
+    {
+      "file": "neuron_65.json",
+      "id": 100251,
+      "type": "KCg-m",
+      "region": "b'L(L)",
+      "nodeCount": 955
+    },
+    {
+      "file": "neuron_66.json",
+      "id": 814940,
+      "type": "SNpp01",
+      "region": "AbN3(R)",
+      "nodeCount": 713
+    },
+    {
+      "file": "neuron_67.json",
+      "id": 819134,
+      "type": "SNpp42",
+      "region": "Ov(R)",
+      "nodeCount": 867
+    },
+    {
+      "file": "neuron_68.json",
+      "id": 10495,
+      "type": "MBON05",
+      "region": "BU(R)",
+      "nodeCount": 2281
+    },
+    {
+      "file": "neuron_69.json",
+      "id": 911607,
+      "type": "IN08A026",
+      "region": "VProN(L)",
+      "nodeCount": 566
+    },
+    {
+      "file": "neuron_70.json",
+      "id": 12253,
+      "type": "LT58",
+      "region": "AME(L)",
+      "nodeCount": 7548
+    },
+    {
+      "file": "neuron_71.json",
+      "id": 512239,
+      "type": "JO-C/D/E",
+      "region": "AMMC(R)",
+      "nodeCount": 288
+    },
+    {
+      "file": "neuron_72.json",
+      "id": 808640,
+      "type": "Sternal posterior rotator MN",
+      "region": "ProAN(L)",
+      "nodeCount": 1472
+    },
+    {
+      "file": "neuron_73.json",
+      "id": 10177,
+      "type": "DNg16",
+      "region": "mVAC(T2)(L)",
+      "nodeCount": 5246
+    },
+    {
+      "file": "neuron_74.json",
+      "id": 60729,
+      "type": "KCa'b'-ap2",
+      "region": "PED(R)",
+      "nodeCount": 249
+    },
+    {
+      "file": "neuron_75.json",
+      "id": 85024,
+      "type": "T5a",
+      "region": "LOP(R)",
+      "nodeCount": 472
+    },
+    {
+      "file": "neuron_76.json",
+      "id": 564770,
+      "type": "ITP",
+      "region": "CA(R)",
+      "nodeCount": 344
+    },
+    {
+      "file": "neuron_77.json",
+      "id": 11886,
+      "type": "ExR1",
+      "region": "EB",
+      "nodeCount": 2868
+    },
+    {
+      "file": "neuron_78.json",
+      "id": 130514,
+      "type": "LoVP12",
+      "region": "ICL(R)",
+      "nodeCount": 638
+    },
+    {
+      "file": "neuron_79.json",
+      "id": 46930,
+      "type": "LLPC2",
+      "region": "PLP(R)",
+      "nodeCount": 335
+    },
+    {
+      "file": "neuron_80.json",
+      "id": 168875,
+      "type": "FB9B_e",
+      "region": "FB",
+      "nodeCount": 646
+    },
+    {
+      "file": "neuron_81.json",
+      "id": 14005,
+      "type": "CL098",
+      "region": "IB",
+      "nodeCount": 845
+    },
+    {
+      "file": "neuron_82.json",
+      "id": 165840,
+      "type": "T5a_unclear",
+      "region": "LOP(R)",
+      "nodeCount": 288
+    },
+    {
+      "file": "neuron_83.json",
+      "id": 136890,
+      "type": "CRE003_a",
+      "region": "CRE(L)",
+      "nodeCount": 573
+    },
+    {
+      "file": "neuron_84.json",
+      "id": 63380,
+      "type": "KCa'b'-ap2",
+      "region": "b'L(R)",
+      "nodeCount": 996
+    },
+    {
+      "file": "neuron_85.json",
+      "id": 802287,
+      "type": "SNpp17",
+      "region": "ProCN(L)",
+      "nodeCount": 851
+    },
+    {
+      "file": "neuron_86.json",
+      "id": 53802,
+      "type": "MeTu4a",
+      "region": "AOTU(L)",
+      "nodeCount": 478
+    },
+    {
+      "file": "neuron_87.json",
+      "id": 16958,
+      "type": "CB4176",
+      "region": "WED(R)",
+      "nodeCount": 1218
+    },
+    {
+      "file": "neuron_88.json",
+      "id": 835920,
+      "type": "SNxxxx",
+      "region": "LegNp(T2)(L)",
+      "nodeCount": 143
+    },
+    {
+      "file": "neuron_89.json",
+      "id": 30586,
+      "type": "LHAV2g1",
+      "region": "LH(R)",
+      "nodeCount": 763
+    },
+    {
+      "file": "neuron_90.json",
+      "id": 800193,
+      "type": "IN01B001",
+      "region": "PDMN(R)",
+      "nodeCount": 6613
+    },
+    {
+      "file": "neuron_91.json",
+      "id": 14994,
+      "type": "ANXXX027",
+      "region": "mVAC(T3)(L)",
+      "nodeCount": 4407
+    },
+    {
+      "file": "neuron_92.json",
+      "id": 206751,
+      "type": "AMMC036",
+      "region": "IPS(L)",
+      "nodeCount": 449
+    },
+    {
+      "file": "neuron_93.json",
+      "id": 818130,
+      "type": "SNpp01",
+      "region": "AbN3(R)",
+      "nodeCount": 563
+    },
+    {
+      "file": "neuron_94.json",
+      "id": 307918,
+      "type": "CB4242",
+      "region": "FLA(L)",
+      "nodeCount": 230
+    },
+    {
+      "file": "neuron_95.json",
+      "id": 49714,
+      "type": "Lat3",
+      "region": "AME(L)",
+      "nodeCount": 721
+    },
+    {
+      "file": "neuron_96.json",
+      "id": 21763,
+      "type": "AN13B002",
+      "region": "ADMN(L)",
+      "nodeCount": 4561
+    },
+    {
+      "file": "neuron_97.json",
+      "id": 946313,
+      "type": "SNppxx",
+      "region": "MetaLN(L)",
+      "nodeCount": 833
+    },
+    {
+      "file": "neuron_98.json",
+      "id": 11316,
+      "type": "CvN4",
+      "region": "CvN(L)",
+      "nodeCount": 1531
+    },
+    {
+      "file": "neuron_99.json",
+      "id": 142082,
+      "type": "LoVP_unclear",
+      "region": "AOTU(L)",
+      "nodeCount": 665
+    },
+    {
+      "file": "neuron_100.json",
+      "id": 27547,
+      "type": "CB1222",
+      "region": "AMMC(L)",
+      "nodeCount": 656
+    },
+    {
+      "file": "neuron_101.json",
+      "id": 104762,
+      "type": "SLP217",
+      "region": "SMP(L)",
+      "nodeCount": 860
+    },
+    {
+      "file": "neuron_102.json",
+      "id": 820684,
+      "type": "IN19A103",
+      "region": "VProN(L)",
+      "nodeCount": 489
+    },
+    {
+      "file": "neuron_103.json",
+      "id": 810004,
+      "type": "SNpp02",
+      "region": "AbN3(L)",
+      "nodeCount": 406
+    },
+    {
+      "file": "neuron_104.json",
+      "id": 57253,
+      "type": "TmY9b",
+      "region": "LOP(L)",
+      "nodeCount": 710
+    },
+    {
+      "file": "neuron_105.json",
+      "id": 955455,
+      "type": "ORN_VC4",
+      "region": "AL(L)",
+      "nodeCount": 272
+    },
+    {
+      "file": "neuron_106.json",
+      "id": 806203,
+      "type": "IN06B077",
+      "region": "Ov(R)",
+      "nodeCount": 1041
+    },
+    {
+      "file": "neuron_107.json",
+      "id": 16476,
+      "type": "Delta7",
+      "region": "PB",
+      "nodeCount": 846
+    },
+    {
+      "file": "neuron_108.json",
+      "id": 10977,
+      "type": "APL",
+      "region": "CA(L)",
+      "nodeCount": 17064
+    },
+    {
+      "file": "neuron_109.json",
+      "id": 163684,
+      "type": "L4",
+      "region": "LA(L)",
+      "nodeCount": 297
+    },
+    {
+      "file": "neuron_110.json",
+      "id": 231070,
+      "type": "CB1851",
+      "region": "ATL(R)",
+      "nodeCount": 895
+    },
+    {
+      "file": "neuron_111.json",
+      "id": 177202,
+      "type": "PAM03",
+      "region": "b'L(L)",
+      "nodeCount": 739
+    },
+    {
+      "file": "neuron_112.json",
+      "id": 904639,
+      "type": "IN06A002",
+      "region": "DMetaN(R)",
+      "nodeCount": 2623
+    },
+    {
+      "file": "neuron_113.json",
+      "id": 38069,
+      "type": "Lawf1",
+      "region": "LA(L)",
+      "nodeCount": 2429
+    },
+    {
+      "file": "neuron_114.json",
+      "id": 189199,
+      "type": "L4",
+      "region": "ME(L)",
+      "nodeCount": 148
+    },
+    {
+      "file": "neuron_115.json",
+      "id": 34448,
+      "type": "Lawf1",
+      "region": "LA(R)",
+      "nodeCount": 719
+    },
+    {
+      "file": "neuron_116.json",
+      "id": 118807,
+      "type": "WED038",
+      "region": "GA(L)",
+      "nodeCount": 421
+    },
+    {
+      "file": "neuron_117.json",
+      "id": 10072,
+      "type": "OA-AL2i1",
+      "region": "PB",
+      "nodeCount": 17534
+    },
+    {
+      "file": "neuron_118.json",
+      "id": 23382,
+      "type": "AN01B002",
+      "region": "AbN4(R)",
+      "nodeCount": 5101
+    },
+    {
+      "file": "neuron_119.json",
+      "id": 17513,
+      "type": "AN05B009",
+      "region": "MetaLN(L)",
+      "nodeCount": 7796
+    },
+    {
+      "file": "neuron_120.json",
+      "id": 152949,
+      "type": "Cm2",
+      "region": "AME(R)",
+      "nodeCount": 376
+    },
+    {
+      "file": "neuron_121.json",
+      "id": 803529,
+      "type": "IN19A073",
+      "region": "MesoAN(L)",
+      "nodeCount": 900
+    },
+    {
+      "file": "neuron_122.json",
+      "id": 524170,
+      "type": "CRE082",
+      "region": "ROB(R)",
+      "nodeCount": 1185
+    },
+    {
+      "file": "neuron_123.json",
+      "id": 196851,
+      "type": "CB1833",
+      "region": "IB",
+      "nodeCount": 603
+    },
+    {
+      "file": "neuron_124.json",
+      "id": 526613,
+      "type": "MeVPLo2",
+      "region": "AME(R)",
+      "nodeCount": 1693
+    },
+    {
+      "file": "neuron_125.json",
+      "id": 846679,
+      "type": "SNpp56",
+      "region": "mVAC(T3)(L)",
+      "nodeCount": 316
+    },
+    {
+      "file": "neuron_126.json",
+      "id": 100294,
+      "type": "LAL150",
+      "region": "CRE(R)",
+      "nodeCount": 494
+    },
+    {
+      "file": "neuron_127.json",
+      "id": 168795,
+      "type": "KCab-c",
+      "region": "CA(L)",
+      "nodeCount": 728
+    },
+    {
+      "file": "neuron_128.json",
+      "id": 800664,
+      "type": "MNad64",
+      "region": "AbNT(L)",
+      "nodeCount": 4164
+    },
+    {
+      "file": "neuron_129.json",
+      "id": 823172,
+      "type": "SNxxxx",
+      "region": "MetaLN(L)",
+      "nodeCount": 75
+    },
+    {
+      "file": "neuron_130.json",
+      "id": 14114,
+      "type": "DNg69",
+      "region": "CvN(R)",
+      "nodeCount": 1618
+    },
+    {
+      "file": "neuron_131.json",
+      "id": 10754,
+      "type": "CvN7",
+      "region": "CvN(R)",
+      "nodeCount": 1461
+    },
+    {
+      "file": "neuron_132.json",
+      "id": 800184,
+      "type": "MNwm36",
+      "region": "MesoAN(L)",
+      "nodeCount": 5778
+    },
+    {
+      "file": "neuron_133.json",
+      "id": 804137,
+      "type": "INXXX333",
+      "region": "AbNT(L)",
+      "nodeCount": 934
+    },
+    {
+      "file": "neuron_134.json",
+      "id": 10417,
+      "type": "DNp103",
+      "region": "AMMC(L)",
+      "nodeCount": 5863
+    },
+    {
+      "file": "neuron_135.json",
+      "id": 49584,
+      "type": "IB016",
+      "region": "ATL(L)",
+      "nodeCount": 938
+    },
+    {
+      "file": "neuron_136.json",
+      "id": 132767,
+      "type": "LoVP12",
+      "region": "PVLP(R)",
+      "nodeCount": 615
+    },
+    {
+      "file": "neuron_137.json",
+      "id": 814764,
+      "type": "SNxx11",
+      "region": "AbNT(L)",
+      "nodeCount": 159
+    },
+    {
+      "file": "neuron_138.json",
+      "id": 69802,
+      "type": "LAL063",
+      "region": "ROB(R)",
+      "nodeCount": 1000
+    },
+    {
+      "file": "neuron_139.json",
+      "id": 530953,
+      "type": "CL014",
+      "region": "ICL(R)",
+      "nodeCount": 910
+    },
+    {
+      "file": "neuron_140.json",
+      "id": 454614,
+      "type": "ER4m",
+      "region": "GA(L)",
+      "nodeCount": 492
+    },
+    {
+      "file": "neuron_141.json",
+      "id": 38483,
+      "type": "AN07B072_e",
+      "region": "NTct(UTct-T1)(R)",
+      "nodeCount": 801
+    },
+    {
+      "file": "neuron_142.json",
+      "id": 10115,
+      "type": "AVLP016",
+      "region": "CAN(L)",
+      "nodeCount": 9811
+    },
+    {
+      "file": "neuron_143.json",
+      "id": 128266,
+      "type": "VES034_b",
+      "region": "SLP(R)",
+      "nodeCount": 573
+    },
+    {
+      "file": "neuron_144.json",
+      "id": 811040,
+      "type": "IN12A050_a",
+      "region": "IntTct",
+      "nodeCount": 599
+    },
+    {
+      "file": "neuron_145.json",
+      "id": 87303,
+      "type": "DNES3",
+      "region": "SMP(L)",
+      "nodeCount": 604
+    },
+    {
+      "file": "neuron_146.json",
+      "id": 155242,
+      "type": "PS342",
+      "region": "IPS(R)",
+      "nodeCount": 591
+    },
+    {
+      "file": "neuron_147.json",
+      "id": 13340,
+      "type": "AVLP713m",
+      "region": "VES(L)",
+      "nodeCount": 1514
+    },
+    {
+      "file": "neuron_148.json",
+      "id": 21051,
+      "type": "LLPC1",
+      "region": "PLP(L)",
+      "nodeCount": 962
+    },
+    {
+      "file": "neuron_149.json",
+      "id": 827773,
+      "type": "SNpp42",
+      "region": "Ov(L)",
+      "nodeCount": 727
+    }
+  ],
+  "brainBounds": {
+    "min": [
+      4096.0,
+      5376.0,
+      8640.0
+    ],
+    "max": [
+      92664.0,
+      68864.0,
+      134528.0
+    ]
+  },
+  "maxDistance": 166501.67
+}

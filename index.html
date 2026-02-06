@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeuronGuessr</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Start Screen -->
+    <div id="screen-start" class="screen active">
+        <div class="start-content">
+            <h1 class="title">NeuronGuessr</h1>
+            <p class="subtitle">Can you locate neurons in the fly brain?</p>
+            <p class="description">
+                You'll see a 3D neuron skeleton. Rotate it, study its shape,
+                then guess where in the brain it belongs and how many synapses it has.
+            </p>
+            <div class="start-info">
+                <div class="info-item">
+                    <span class="info-number">5</span>
+                    <span class="info-label">Rounds</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-number">10K</span>
+                    <span class="info-label">Max pts/round</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-number">50K</span>
+                    <span class="info-label">Perfect score</span>
+                </div>
+            </div>
+            <button id="btn-start" class="btn-primary">Play</button>
+            <button id="btn-scoring" class="btn-link">How Scoring Works</button>
+            <p class="credit">Data: <em>Drosophila</em> Male CNS Connectome</p>
+        </div>
+    </div>
+
+    <!-- Loading Screen -->
+    <div id="screen-loading" class="screen">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <p id="loading-text">Loading brain meshes...</p>
+        </div>
+    </div>
+
+    <!-- Game Screen -->
+    <div id="screen-game" class="screen">
+        <!-- Top bar -->
+        <div id="game-hud">
+            <span id="round-counter">Round 1 / 5</span>
+            <span id="total-score">Score: 0</span>
+        </div>
+
+        <!-- Split panel -->
+        <div id="game-panels">
+            <!-- Left: Neuron viewer -->
+            <div id="panel-neuron" class="panel">
+                <div id="neuron-canvas-container" class="canvas-container"></div>
+                <div class="panel-label">
+                    Mystery Neuron <span class="hint">(drag to rotate)</span>
+                    <button id="btn-reset-neuron" class="btn-small">Reset View</button>
+                </div>
+            </div>
+
+            <!-- Right: Brain guess panel -->
+            <div id="panel-brain" class="panel">
+                <div id="brain-canvas-container" class="canvas-container"></div>
+                <div class="panel-label">
+                    Click to place guess, Shift+scroll to adjust depth
+                    <span id="guess-coords" class="coords-display"></span>
+                    <button id="btn-toggle-roi" class="btn-small">Show Brain Regions</button>
+                    <button id="btn-toggle-ortho" class="btn-small">Perspective View</button>
+                    <button id="btn-reset-view" class="btn-small">Reset View</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom action bar -->
+        <div id="game-actions">
+            <div class="synapse-guess-row">
+                <label class="synapse-label" for="synapse-slider">Synapses:</label>
+                <input type="range" id="synapse-slider" min="0" max="1000" value="500" step="1">
+                <input type="text" id="synapse-value" class="synapse-value" inputmode="numeric" value="1,000">
+            </div>
+            <button id="btn-submit" class="btn-primary" disabled>Submit Guess</button>
+        </div>
+    </div>
+
+    <!-- Round Result -->
+    <div id="screen-result" class="screen">
+        <div id="game-hud-result" class="game-hud-clone">
+            <span id="round-counter-result"></span>
+            <span id="total-score-result"></span>
+        </div>
+        <div id="result-layout">
+            <div id="result-brain-panel" class="panel">
+                <div id="result-brain-container" class="canvas-container"></div>
+            </div>
+            <div id="result-info-panel">
+                <div class="result-card">
+                    <h2 id="result-title">Round 1 Result</h2>
+                    <div id="result-score" class="big-score">0</div>
+                    <div class="result-score-breakdown">
+                        <span id="result-loc-score" class="sub-score">Location: 0</span>
+                        <span id="result-syn-score" class="sub-score">Synapses: 0</span>
+                    </div>
+                    <div class="result-details">
+                        <div class="detail-row">
+                            <span class="detail-label">Distance</span>
+                            <span id="result-distance" class="detail-value">0 um</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Synapses (yours / actual)</span>
+                            <span id="result-synapses" class="detail-value">- / -</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Neuron Type</span>
+                            <span id="result-type" class="detail-value">-</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Brain Region</span>
+                            <span id="result-region" class="detail-value">-</span>
+                        </div>
+                    </div>
+                    <p class="result-hint">
+                        <span class="marker-legend guess-dot"></span> Your guess
+                        <span class="marker-legend answer-dot"></span> Actual location
+                        <span class="marker-legend neuron-color"></span> Neuron
+                    </p>
+                    <button id="btn-next" class="btn-primary">Next Round</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scoring Info Overlay -->
+    <div id="screen-scoring" class="screen overlay">
+        <div class="scoring-card">
+            <h2>How Scoring Works</h2>
+            <div class="scoring-section">
+                <h3>Location <span class="scoring-max">max 5,000 pts</span></h3>
+                <p class="scoring-formula">5000 &times; e<sup>&minus;(3.5 &times; d / D)&sup2;</sup></p>
+                <p class="scoring-desc">d = distance to actual position, D = brain diagonal (~1,050 &micro;m)</p>
+                <canvas id="chart-location" width="400" height="180"></canvas>
+            </div>
+            <div class="scoring-section">
+                <h3>Synapses <span class="scoring-max">max 5,000 pts</span></h3>
+                <p class="scoring-formula">5000 &times; e<sup>&minus;1.5 &times; |ln(guess / actual)|</sup></p>
+                <p class="scoring-desc">Log-ratio: being 2x off costs the same at 100 or 100,000 synapses</p>
+                <canvas id="chart-synapse" width="400" height="180"></canvas>
+            </div>
+            <button id="btn-close-scoring" class="btn-primary">Got it</button>
+        </div>
+    </div>
+
+    <!-- Final Score Screen -->
+    <div id="screen-final" class="screen">
+        <div id="final-layout">
+            <div id="final-brain-panel" class="panel">
+                <div id="final-brain-container" class="canvas-container"></div>
+                <div class="panel-label">
+                    All guesses overview
+                    <span class="hint">&mdash; <span class="marker-legend guess-dot"></span> guess <span class="marker-legend answer-dot"></span> actual</span>
+                </div>
+            </div>
+            <div id="final-info-panel">
+                <div class="final-card">
+                    <h1>Game Over</h1>
+                    <div id="final-score" class="big-score">0</div>
+                    <p class="final-subtitle">out of 50,000</p>
+                    <div id="round-breakdown"></div>
+                    <button id="btn-replay" class="btn-primary">Play Again</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.170.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.170.0/examples/jsm/"
+        }
+    }
+    </script>
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>
