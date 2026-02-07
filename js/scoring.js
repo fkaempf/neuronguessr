@@ -24,16 +24,16 @@ export function euclideanDistance(a, b) {
  * Compute location score.
  *
  * Gaussian curve - flat plateau near perfect, then drops off.
- * Formula: 5000 * exp(-(3.5 * d / D)^2)
+ * Formula: 5000 * exp(-(6.6 * d / D)^2)
  *   d = 0      -> 5000 (perfect)
- *   d = D/10   -> 4,423
- *   d = D/5    -> 3,063
- *   d = 0.3D   -> 1,661
- *   d = D/2    -> 234
+ *   d = 75µm   -> 4,000
+ *   d = 150µm  -> 2,060
+ *   d = 250µm  -> 340
+ *   d = 350µm  -> 12
  */
 export function computeLocationScore(guess, answer, maxDistance) {
     const distance = euclideanDistance(guess, answer);
-    const k = 3.5;
+    const k = 6.6;
     const r = k * distance / maxDistance;
     const score = Math.round(MAX_LOCATION_POINTS * Math.exp(-(r * r)));
     return { score, distance };

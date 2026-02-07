@@ -76,10 +76,12 @@ export class BrainViewer {
         this.guessEnabled = true;
         this.showIndividualRois = false; // default: fused mesh
 
-        // Depth control: smooth target-based interpolation
-        this._guessSurfacePoint = null;  // surface hit point (for opacity calc)
-        this._guessTargetPos = null;     // where the marker is gliding toward
-        this._depthGuideLine = null;     // dotted line showing depth axis (perspective only)
+        // Depth control: scalar depth along fixed line direction (set on click)
+        this._guessSurfacePoint = null;  // surface hit point (anchor)
+        this._guessLineDir = null;       // fixed direction set at click time
+        this._guessDepth = 0;            // scalar distance from surface along line
+        this._guessDepthTarget = 0;      // target depth (for smooth lerp)
+        this._depthGuideLine = null;     // dotted line showing depth axis
 
         // Click-vs-drag detection: only place guess on clean clicks, not drags
         this._pointerDownPos = null;
@@ -93,7 +95,6 @@ export class BrainViewer {
             const dy = e.clientY - this._pointerDownPos.y;
             const dist = Math.sqrt(dx * dx + dy * dy);
             this._pointerDownPos = null;
-            // Only treat as click if pointer moved less than 5px
             if (dist < 5) {
                 this._onClick(e);
             }
@@ -283,11 +284,15 @@ export class BrainViewer {
         if (intersects.length > 0) {
             const point = intersects[0].point.clone();
 
-            // Store surface point (for opacity) and set target
+            // Store surface point and lock the depth line direction at click time
             this._guessSurfacePoint = point.clone();
-            this._guessTargetPos = point.clone();
+            this._guessLineDir = new THREE.Vector3()
+                .subVectors(this.controls.target, this.camera.position)
+                .normalize();
+            this._guessDepth = 0;
+            this._guessDepthTarget = 0;
 
-            // Snap marker directly to surface on click (no lerp for initial placement)
+            // Snap marker directly to surface on click
             this._placeGuessMarker(point);
             if (this.guessMarker) {
                 this.guessMarker.material.opacity = 1.0;
@@ -309,7 +314,7 @@ export class BrainViewer {
     _onWheel(event) {
         if (!event.shiftKey) return; // normal scroll = zoom
         if (!this.guessEnabled) return;
-        if (!this._guessTargetPos) return;
+        if (!this._guessSurfacePoint || !this._guessLineDir) return;
         if (!this.guessMarker || !this.guessMarker.visible) return;
 
         event.preventDefault();
@@ -318,19 +323,25 @@ export class BrainViewer {
         const rawDelta = Math.abs(event.deltaX) > Math.abs(event.deltaY)
             ? event.deltaX : event.deltaY;
 
-        // Scale scroll delta continuously (no fixed steps)
-        const speed = 15;
-        const delta = rawDelta * speed;
+        this.adjustDepth(rawDelta * 15);
+    }
 
-        // Move the TARGET from its current position along current view direction
-        const viewDir = new THREE.Vector3();
-        this.camera.getWorldDirection(viewDir);
-        this._guessTargetPos.addScaledVector(viewDir, delta);
+    /**
+     * Adjust depth by a delta amount along the fixed line direction.
+     * Returns true if depth was adjusted, false if no guess is active.
+     */
+    adjustDepth(delta) {
+        if (!this.guessEnabled || !this._guessSurfacePoint || !this._guessLineDir) return false;
+        if (!this.guessMarker || !this.guessMarker.visible) return false;
+        this._guessDepthTarget += delta;
 
-        // Report target position immediately for responsive coordinate display
+        // Report projected position immediately for responsive coordinate display
         if (this.onGuessPlaced) {
-            this.onGuessPlaced(this._toData(this._guessTargetPos));
+            const pos = this._guessSurfacePoint.clone()
+                .addScaledVector(this._guessLineDir, this._guessDepthTarget);
+            this.onGuessPlaced(this._toData(pos));
         }
+        return true;
     }
 
     _placeGuessMarker(position) {
@@ -342,18 +353,6 @@ export class BrainViewer {
         }
         this.guessMarker.position.copy(position);
         this.guessMarker.visible = true;
-
-        // Small anchor dot at surface origin of the rail
-        if (!this._surfaceAnchor) {
-            const geo = new THREE.SphereGeometry(200, 12, 12);
-            const mat = new THREE.MeshBasicMaterial({
-                color: 0x00ff88, opacity: 0.4, transparent: true,
-            });
-            this._surfaceAnchor = new THREE.Mesh(geo, mat);
-            this.scene.add(this._surfaceAnchor);
-        }
-        this._surfaceAnchor.position.copy(position);
-        this._surfaceAnchor.visible = true;
     }
 
     /**
@@ -495,28 +494,26 @@ export class BrainViewer {
      * Only shown in perspective mode.
      */
     _updateDepthGuide() {
-        if (!this.guessEnabled || !this.guessMarker || !this.guessMarker.visible
-            || !this._guessSurfacePoint) {
+        if (!this.guessEnabled || !this.guessMarker || !this.guessMarker.visible) {
             this._hideDepthGuide();
             return;
         }
 
-        // Rail from surface point into the brain — the ball slides along it
-        const surface = this._guessSurfacePoint;
-        const marker = this.guessMarker.position;
-        const dir = new THREE.Vector3().subVectors(marker, surface);
-        const len = dir.length();
-
-        let lineDir;
-        if (len < 1) {
-            lineDir = new THREE.Vector3();
-            this.camera.getWorldDirection(lineDir);
-        } else {
-            lineDir = dir.normalize();
+        if (this.isOrtho) {
+            this._hideDepthGuide();
+            return;
         }
 
-        const start = surface.clone().addScaledVector(lineDir, -1000000);
-        const end = surface.clone().addScaledVector(lineDir, 1000000);
+        if (!this._guessLineDir || !this._guessSurfacePoint) {
+            this._hideDepthGuide();
+            return;
+        }
+
+        // Line uses the fixed direction set at click time — never changes
+        // Short behind surface (toward camera), long into brain
+        const anchor = this._guessSurfacePoint;
+        const start = anchor.clone().addScaledVector(this._guessLineDir, -10000000);
+        const end = anchor.clone().addScaledVector(this._guessLineDir, 10000000);
 
         // Lazy-init shared material
         if (!this._depthGuideMat) {
@@ -529,7 +526,7 @@ export class BrainViewer {
             });
         }
 
-        // Recreate line geometry each frame
+        // Recreate line geometry each frame so direction always matches camera
         if (this._depthGuideLine) {
             this.scene.remove(this._depthGuideLine);
             this._depthGuideLine.geometry.dispose();
@@ -555,9 +552,6 @@ export class BrainViewer {
         if (this.guessMarker) {
             this.guessMarker.visible = false;
         }
-        if (this._surfaceAnchor) {
-            this._surfaceAnchor.visible = false;
-        }
         this._hideDepthGuide();
         if (this.answerMarker) {
             this.scene.remove(this.answerMarker);
@@ -579,7 +573,9 @@ export class BrainViewer {
         }
         this.guessEnabled = true;
         this._guessSurfacePoint = null;
-        this._guessTargetPos = null;
+        this._guessLineDir = null;
+        this._guessDepth = 0;
+        this._guessDepthTarget = 0;
     }
 
     _fitCameraToBrain() {
@@ -604,7 +600,7 @@ export class BrainViewer {
 
         if (this.camera.isPerspectiveCamera) {
             this.camera.near = 10;
-            this.camera.far = maxDim * 10;
+            this.camera.far = maxDim * 100;
         }
         if (this.camera.isOrthographicCamera) {
             this._updateOrthoFrustum();
@@ -675,25 +671,22 @@ export class BrainViewer {
         requestAnimationFrame(this._animate);
         this.controls.update();
 
-        // Smoothly glide guess marker toward its target position
-        if (this.guessMarker && this.guessMarker.visible &&
-            this._guessTargetPos && this._guessSurfacePoint) {
-            this.guessMarker.position.lerp(this._guessTargetPos, 0.18);
+        // Compute marker position: surfacePoint + depth * lineDir (always on the fixed line)
+        if (this.guessMarker && this.guessMarker.visible
+            && this._guessSurfacePoint && this._guessLineDir) {
+            // Smooth depth lerp
+            this._guessDepth += (this._guessDepthTarget - this._guessDepth) * 0.18;
 
-            // Brightness based on camera distance: closer = bright green, farther = dark
-            const camDist = this.camera.position.distanceTo(this.guessMarker.position);
-            const surfDist = this.camera.position.distanceTo(this._guessSurfacePoint);
-            const depthBeyondSurface = camDist - surfDist;
-            // Gradual Gaussian falloff over ~15000 units (~120µm)
-            const t = depthBeyondSurface / 15000;
-            const brightness = Math.max(0.06, Math.exp(-(t * t) * 3));
-            this.guessMarker.material.color.setRGB(0, brightness, brightness * 0.53);
+            // Position marker along the fixed line
+            const targetPos = this._guessSurfacePoint.clone()
+                .addScaledVector(this._guessLineDir, this._guessDepth);
+            this.guessMarker.position.copy(targetPos);
+
+            // Constant bright green, constant size
+            this.guessMarker.material.color.setRGB(0, 1, 0.53);
             this.guessMarker.material.opacity = 1.0;
             this.guessMarker.material.transparent = false;
-            // Size scales with depth: large at surface (2.0x), small when deep (0.3x)
-            const st = Math.max(0, 1.0 - depthBeyondSurface / 30000);
-            const scale = 0.3 + 1.7 * st;
-            this.guessMarker.scale.setScalar(scale);
+            this.guessMarker.scale.setScalar(1.0);
 
             // Depth guide line in perspective mode: dotted line along view direction
             this._updateDepthGuide();

@@ -265,6 +265,19 @@ $btnToggleOrtho.addEventListener('click', () => {
 $btnResetView.addEventListener('click', () => brainViewer.resetCamera());
 $btnResetNeuron.addEventListener('click', () => neuronViewer.resetCamera());
 
+// Arrow keys / = / - for depth adjustment
+document.onkeydown = function(e) {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+    if (!brainViewer) return;
+    if (e.key === 'ArrowUp' || e.key === '=' || e.key === '+') {
+        e.preventDefault();
+        brainViewer.adjustDepth(1500);
+    } else if (e.key === 'ArrowDown' || e.key === '-') {
+        e.preventDefault();
+        brainViewer.adjustDepth(-1500);
+    }
+};
+
 $btnScoring.addEventListener('click', () => {
     showScreen('screen-scoring');
     drawScoringCharts();
@@ -274,7 +287,7 @@ $btnCloseScoring.addEventListener('click', () => showScreen('screen-start'));
 // --- Scoring Charts ---
 function drawScoringCharts() {
     const D = 1050; // brain diagonal in µm
-    const k = 3.5;
+    const k = 6.6;
     drawChart('chart-location', {
         fn: (x) => { const r = k * x / D; return 5000 * Math.exp(-(r * r)); },
         xMax: 600,
