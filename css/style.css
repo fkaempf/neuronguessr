@@ -95,10 +95,22 @@ body {
     letter-spacing: 1px;
 }
 
+.privacy-note {
+    font-size: 11px;
+    color: #555;
+    max-width: 420px;
+    line-height: 1.5;
+    margin-top: 24px;
+}
+.privacy-note a {
+    color: #666;
+}
+
 .credit {
     font-size: 12px;
     color: #555;
-    margin-top: 32px;
+    margin-top: 12px;
+    line-height: 1.6;
 }
 .credit a {
     color: #666;

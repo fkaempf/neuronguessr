@@ -1,11 +1,14 @@
 /**
- * Three.js viewer for displaying a mystery neuron skeleton in isolation.
+ * Three.js viewer for displaying a mystery neuron in isolation.
  * The neuron is centered at the origin with no brain context.
  * Player can rotate and zoom to study its morphology.
  */
 
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+// Data is in 8nm voxel units → 1 voxel = 0.008 µm
+const VOXEL_TO_UM = 0.008;
 
 export class NeuronViewer {
     /**
@@ -48,6 +51,9 @@ export class NeuronViewer {
         // Current neuron group
         this.currentGroup = null;
 
+        // Scale bar overlay
+        this._scaleBarEl = this._createScaleBar();
+
         // Start animation loop
         this._animate = this._animate.bind(this);
         this._animate();
@@ -55,6 +61,77 @@ export class NeuronViewer {
         // Handle resize
         this._resizeObserver = new ResizeObserver(() => this._onResize());
         this._resizeObserver.observe(container);
+    }
+
+    _createScaleBar() {
+        const bar = document.createElement('div');
+        bar.style.cssText = `
+            position: absolute; bottom: 40px; left: 16px;
+            display: flex; flex-direction: column; align-items: flex-start;
+            pointer-events: none; z-index: 5;
+        `;
+        const line = document.createElement('div');
+        line.style.cssText = `
+            height: 2px; background: rgba(255,255,255,0.7);
+            border-left: 2px solid rgba(255,255,255,0.7);
+            border-right: 2px solid rgba(255,255,255,0.7);
+            min-height: 8px; box-sizing: content-box;
+        `;
+        // Use padding-top trick: the 2px height is the bar, the 8px border-left/right are the end caps
+        line.style.height = '8px';
+        line.style.borderTop = '2px solid rgba(255,255,255,0.7)';
+        line.style.borderLeft = '2px solid rgba(255,255,255,0.7)';
+        line.style.borderRight = '2px solid rgba(255,255,255,0.7)';
+        line.style.background = 'none';
+        line.style.width = '60px';
+        const label = document.createElement('div');
+        label.style.cssText = `
+            color: rgba(255,255,255,0.7); font-size: 11px;
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            margin-top: 2px;
+        `;
+        label.textContent = '';
+        bar.appendChild(line);
+        bar.appendChild(label);
+        this.container.appendChild(bar);
+        this._scaleBarLine = line;
+        this._scaleBarLabel = label;
+        return bar;
+    }
+
+    _updateScaleBar() {
+        if (!this._lastMaxDim) return;
+
+        const w = this.container.clientWidth;
+        const h = this.container.clientHeight;
+        if (w === 0 || h === 0) return;
+
+        // Compute world-space width visible at the target distance
+        const dist = this.camera.position.distanceTo(this.controls.target);
+        const fovRad = THREE.MathUtils.degToRad(this.camera.fov);
+        const worldHeight = 2 * dist * Math.tan(fovRad / 2);
+        const worldWidth = worldHeight * (w / h);
+        const voxelsPerPixel = worldWidth / w;
+
+        // Target: scale bar ~80-120px wide, pick a nice round µm value
+        const targetPx = 100;
+        const targetVoxels = voxelsPerPixel * targetPx;
+        const targetUm = targetVoxels * VOXEL_TO_UM;
+
+        // Pick a nice round value: 1, 2, 5, 10, 20, 50, 100, 200, 500...
+        const niceSteps = [1, 2, 5, 10, 20, 50, 100, 200, 500, 1000];
+        let bestUm = niceSteps[0];
+        for (const step of niceSteps) {
+            if (step <= targetUm * 1.5) bestUm = step;
+        }
+
+        const barVoxels = bestUm / VOXEL_TO_UM;
+        const barPx = barVoxels / voxelsPerPixel;
+
+        this._scaleBarLine.style.width = `${Math.round(barPx)}px`;
+        this._scaleBarLabel.textContent = bestUm >= 1000
+            ? `${(bestUm / 1000).toFixed(bestUm % 1000 === 0 ? 0 : 1)} mm`
+            : `${bestUm} \u00B5m`;
     }
 
     /**
@@ -156,6 +233,7 @@ export class NeuronViewer {
         this.camera.updateProjectionMatrix();
         this.controls.target.set(0, 0, 0);
         this.controls.update();
+        this._updateScaleBar();
     }
 
     resetCamera() {
@@ -170,6 +248,7 @@ export class NeuronViewer {
     _animate() {
         requestAnimationFrame(this._animate);
         this.controls.update();
+        this._updateScaleBar();
         this.renderer.render(this.scene, this.camera);
     }
 

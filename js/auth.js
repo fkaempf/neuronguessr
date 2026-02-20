@@ -62,7 +62,8 @@ function _notifyChange() {
  */
 export function setManualToken(token) {
     if (!token || !token.trim()) return;
-    _token = token.trim();
+    // Strip non-ASCII characters (BOM, smart quotes, etc. from copy-paste)
+    _token = token.trim().replace(/[^\x20-\x7E]/g, '');
     _userEmail = 'token user';
     sessionStorage.setItem('neuprint_token', _token);
     sessionStorage.setItem('neuprint_email', _userEmail);
