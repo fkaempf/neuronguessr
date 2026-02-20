@@ -56,11 +56,11 @@ export class BrainViewer {
         this.controls.maxPolarAngle = Math.PI - 0.05;
 
         // Lighting
-        this.scene.add(new THREE.AmbientLight(0xffffff, 0.6));
-        const dirLight = new THREE.DirectionalLight(0xffffff, 0.6);
+        this.scene.add(new THREE.AmbientLight(0xffffff, 1.0));
+        const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
         dirLight.position.set(1, 1, 1).normalize();
         this.scene.add(dirLight);
-        const dirLight2 = new THREE.DirectionalLight(0xffffff, 0.3);
+        const dirLight2 = new THREE.DirectionalLight(0xffffff, 0.5);
         dirLight2.position.set(-1, -0.5, -1).normalize();
         this.scene.add(dirLight2);
 
