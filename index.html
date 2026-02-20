@@ -71,7 +71,10 @@
                     <span class="mode-desc">Random neurons every time</span>
                 </button>
             </div>
-            <p id="daily-status" class="daily-status" style="display:none;"></p>
+            <div id="daily-status-row" class="daily-status-row" style="display:none;">
+                <p id="daily-status" class="daily-status"></p>
+                <button id="btn-share-start" class="btn-share-start">Share</button>
+            </div>
 
             <button id="btn-scoring" class="btn-link">How Scoring Works</button>
             <p class="privacy-note">
@@ -233,6 +236,7 @@
                 <div class="final-card">
                     <h1>Game Over</h1>
                     <div id="final-score" class="big-score">0</div>
+                    <button id="btn-share" class="btn-share" style="display:none;">Share</button>
                     <p class="final-subtitle">out of 50,000</p>
                     <div id="round-breakdown"></div>
                     <div id="score-submit-row" class="score-submit-row">

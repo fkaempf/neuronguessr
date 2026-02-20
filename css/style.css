@@ -207,6 +207,39 @@ body {
     margin-bottom: 8px;
 }
 
+.daily-status-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+    justify-content: center;
+}
+
+.btn-share,
+.btn-share-start {
+    background: transparent;
+    border: 1px solid #4CAF50;
+    color: #4CAF50;
+    padding: 5px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: background 0.15s;
+    white-space: nowrap;
+}
+
+.btn-share:hover,
+.btn-share-start:hover {
+    background: rgba(76, 175, 80, 0.12);
+}
+
+/* Larger share button on final screen */
+.btn-share {
+    padding: 8px 20px;
+    font-size: 14px;
+    margin: 4px 0 2px;
+}
+
 /* === Auth Section === */
 .auth-section {
     margin-bottom: 16px;
