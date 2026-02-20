@@ -86,12 +86,9 @@ export class BrainViewer {
         this._guessDepthTarget = 0;      // target depth (for smooth lerp)
         this._depthGuideLine = null;     // dotted line showing depth axis
 
-        // Scale bar overlay
-        this._scaleBarEl = document.createElement('div');
-        this._scaleBarEl.className = 'scale-bar';
-        this._scaleBarEl.innerHTML = '<div class="scale-bar-line"></div><span class="scale-bar-label">100 μm</span>';
+        // Scale bar overlay (matches neuron viewer style)
+        this._scaleBarEl = this._createScaleBar();
         container.style.position = 'relative';
-        container.appendChild(this._scaleBarEl);
 
         // Click-vs-drag detection: only place guess on clean clicks, not drags
         this._pointerDownPos = null;
@@ -639,10 +636,10 @@ export class BrainViewer {
         this._brainSize = box.getSize(new THREE.Vector3());
         const maxDim = Math.max(this._brainSize.x, this._brainSize.y, this._brainSize.z);
 
-        // Position camera looking at the front of the brain (standard view)
+        // Position camera looking at the front of the brain (anterior view)
         this.camera.position.set(
             this._brainCenter.x, this._brainCenter.y,
-            this._brainCenter.z - maxDim * 1.2
+            this._brainCenter.z + maxDim * 1.2
         );
         this.camera.up.set(0, 1, 0);
 
@@ -753,23 +750,69 @@ export class BrainViewer {
      * Update the scale bar width to represent 100μm at current zoom.
      * 1 voxel unit = 8nm, so 100μm = 12500 units.
      */
+    _createScaleBar() {
+        const bar = document.createElement('div');
+        bar.style.cssText = `
+            position: absolute; bottom: 12px; left: 12px;
+            display: flex; flex-direction: column; align-items: flex-start;
+            pointer-events: none; z-index: 10;
+        `;
+        const line = document.createElement('div');
+        line.style.cssText = `
+            height: 8px; width: 60px; box-sizing: content-box;
+            border-top: 2px solid rgba(255,255,255,0.7);
+            border-left: 2px solid rgba(255,255,255,0.7);
+            border-right: 2px solid rgba(255,255,255,0.7);
+        `;
+        const label = document.createElement('div');
+        label.style.cssText = `
+            color: rgba(255,255,255,0.7); font-size: 11px;
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            margin-top: 2px;
+        `;
+        bar.appendChild(line);
+        bar.appendChild(label);
+        this.container.appendChild(bar);
+        this._scaleBarLine = line;
+        this._scaleBarLabel = label;
+        return bar;
+    }
+
     _updateScaleBar() {
         if (!this._scaleBarEl || !this._brainCenter) return;
-        const SCALE_UNITS = 12500; // 100μm in 8nm voxel units
 
-        // Project two points separated by SCALE_UNITS in screen space
+        const VOXEL_TO_UM = 0.008; // 1 voxel = 8nm = 0.008μm
+        const w = this.renderer.domElement.clientWidth;
+        if (w === 0) return;
+
+        // Project two points 1 voxel apart to get pixels-per-voxel
         const p1 = this._brainCenter.clone();
         const p2 = this._brainCenter.clone();
-        p2.x += SCALE_UNITS;
-
+        p2.x += 1;
         p1.project(this.camera);
         p2.project(this.camera);
+        const pxPerVoxel = Math.abs((p2.x - p1.x) * 0.5 * w);
+        if (pxPerVoxel === 0) return;
 
-        const w = this.renderer.domElement.clientWidth;
-        const px = Math.abs((p2.x - p1.x) * 0.5 * w);
+        const voxelsPerPixel = 1 / pxPerVoxel;
+        const targetPx = 100;
+        const targetVoxels = voxelsPerPixel * targetPx;
+        const targetUm = targetVoxels * VOXEL_TO_UM;
 
-        const line = this._scaleBarEl.querySelector('.scale-bar-line');
-        if (line) line.style.width = Math.max(20, Math.min(px, 200)) + 'px';
+        // Pick a nice round value
+        const niceSteps = [1, 2, 5, 10, 20, 50, 100, 200, 500, 1000];
+        let bestUm = niceSteps[0];
+        for (const step of niceSteps) {
+            if (step <= targetUm * 1.5) bestUm = step;
+        }
+
+        const barVoxels = bestUm / VOXEL_TO_UM;
+        const barPx = barVoxels * pxPerVoxel;
+
+        this._scaleBarLine.style.width = `${Math.round(barPx)}px`;
+        this._scaleBarLabel.textContent = bestUm >= 1000
+            ? `${(bestUm / 1000).toFixed(bestUm % 1000 === 0 ? 0 : 1)} mm`
+            : `${bestUm} \u00B5m`;
     }
 
     _onResize() {

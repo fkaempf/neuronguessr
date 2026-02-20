@@ -391,35 +391,6 @@ body {
 /* Desktop/mobile label text (toggled via media query) */
 .panel-label-mobile { display: none; }
 
-/* === Scale Bar === */
-.scale-bar {
-    position: absolute;
-    bottom: 12px;
-    left: 12px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    pointer-events: none;
-    z-index: 10;
-}
-
-.scale-bar-line {
-    height: 2px;
-    background: #ccc;
-    width: 60px;
-    border-left: 2px solid #ccc;
-    border-right: 2px solid #ccc;
-    padding-top: 6px;
-    padding-bottom: 6px;
-    background-clip: content-box;
-}
-
-.scale-bar-label {
-    color: #ccc;
-    font-size: 11px;
-    font-family: 'SF Mono', 'Fira Code', monospace;
-}
-
 /* === Depth Slider === */
 .depth-slider-row {
     padding: 6px 16px;
