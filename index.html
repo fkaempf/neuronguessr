@@ -115,10 +115,6 @@
             <!-- Right: Brain guess panel -->
             <div id="panel-brain" class="panel">
                 <div id="brain-canvas-container" class="canvas-container"></div>
-                <div id="depth-slider-row" class="depth-slider-row" style="display:none;">
-                    <label class="depth-label">Depth:</label>
-                    <input type="range" id="depth-slider" min="-500" max="500" value="0" step="1">
-                </div>
                 <div class="panel-label">
                     <span class="panel-label-desktop">Click to place guess, Shift+scroll to adjust depth</span>
                     <span class="panel-label-mobile">Tap to place guess</span>
@@ -132,6 +128,10 @@
 
         <!-- Bottom action bar -->
         <div id="game-actions">
+            <div id="depth-slider-row" class="depth-slider-row" style="display:none;">
+                <label class="depth-label">Depth:</label>
+                <input type="range" id="depth-slider" min="-500" max="500" value="0" step="1">
+            </div>
             <div class="synapse-guess-row">
                 <label class="synapse-label" for="synapse-slider">Synapses:</label>
                 <input type="range" id="synapse-slider" min="0" max="1000" value="500" step="1">
