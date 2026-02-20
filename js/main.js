@@ -468,6 +468,7 @@ function showFinalScore() {
             `daily_result_${manifest.date}`,
             JSON.stringify({ totalScore: gameState.totalScore, roundScores: gameState.roundScores, date: manifest.date })
         );
+        localStorage.setItem(`daily_played_${manifest.date}`, String(gameState.totalScore));
     }
 
     // Auto-load leaderboard
@@ -545,7 +546,8 @@ $btnReplay.addEventListener('click', () => {
     updateAuthUI();
 });
 $btnShare.addEventListener('click', async () => {
-    const stored = JSON.parse(localStorage.getItem(`daily_result_${manifest?.date}`) || 'null');
+    const today = new Date().toISOString().split('T')[0];
+    const stored = JSON.parse(localStorage.getItem(`daily_result_${today}`) || 'null');
     if (!stored) return;
     const text = generateShareText(stored.date, stored.totalScore, stored.roundScores);
     try {
