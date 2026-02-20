@@ -620,6 +620,29 @@ export class BrainViewer {
         this._guessLineDir = null;
         this._guessDepth = 0;
         this._guessDepthTarget = 0;
+        this.resetView();
+    }
+
+    /**
+     * Reset camera to standard anatomical view.
+     */
+    resetView() {
+        if (!this._brainCenter || !this._brainSize) return;
+        const maxDim = Math.max(this._brainSize.x, this._brainSize.y, this._brainSize.z);
+        const dist = maxDim * 1.2;
+        const angle = 145 * Math.PI / 180;
+        this.camera.position.set(
+            this._brainCenter.x + dist * Math.sin(angle),
+            this._brainCenter.y,
+            this._brainCenter.z + dist * Math.cos(angle)
+        );
+        this.camera.up.set(0, 1, 0);
+        if (this.camera.isOrthographicCamera) {
+            this._updateOrthoFrustum();
+        }
+        this.camera.updateProjectionMatrix();
+        this.controls.target.copy(this._brainCenter);
+        this.controls.update();
     }
 
     _fitCameraToBrain() {
