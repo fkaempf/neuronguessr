@@ -53,7 +53,7 @@ export function renderLeaderboard(container, scores, myScore) {
  * Render score histogram on a canvas.
  */
 export function renderHistogram(canvas, scores, myScore) {
-    if (!scores || scores.length < 2) {
+    if (!scores || scores.length === 0) {
         canvas.style.display = 'none';
         return;
     }

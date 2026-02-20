@@ -406,13 +406,13 @@ async function loadLeaderboard() {
     const date = manifest?.date || new Date().toISOString().split('T')[0];
     try {
         const data = await fetchScores(gameMode, date);
-        if (data.scores && data.scores.length > 0) {
-            $leaderboardSection.style.display = 'block';
-            renderLeaderboard($leaderboardContainer, data.scores, gameState.totalScore);
-            renderHistogram($histogramCanvas, data.scores, gameState.totalScore);
-        }
+        $leaderboardSection.style.display = 'block';
+        renderLeaderboard($leaderboardContainer, data.scores || [], gameState.totalScore);
+        renderHistogram($histogramCanvas, data.scores || [], gameState.totalScore);
     } catch (err) {
         console.error('Failed to load leaderboard:', err);
+        $leaderboardSection.style.display = 'block';
+        renderLeaderboard($leaderboardContainer, [], gameState.totalScore);
     }
 }
 

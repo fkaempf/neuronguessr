@@ -629,10 +629,10 @@ export class BrainViewer {
         this._brainSize = box.getSize(new THREE.Vector3());
         const maxDim = Math.max(this._brainSize.x, this._brainSize.y, this._brainSize.z);
 
-        // Position camera looking from back (posterior view)
+        // Position camera looking from front (anterior view)
         this.camera.position.set(
             this._brainCenter.x, this._brainCenter.y,
-            this._brainCenter.z - maxDim * 1.2
+            this._brainCenter.z + maxDim * 1.2
         );
 
         if (this.camera.isPerspectiveCamera) {
