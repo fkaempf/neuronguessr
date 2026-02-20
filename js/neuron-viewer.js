@@ -201,20 +201,6 @@ export class NeuronViewer {
             group.add(new THREE.LineSegments(geometry, new THREE.LineBasicMaterial({ color })));
         }
 
-        // Soma marker (white sphere)
-        if (neuronData.soma) {
-            const somaRadius = 125 / 2;
-            const somaGeo = new THREE.SphereGeometry(somaRadius, 16, 16);
-            const somaMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
-            const somaMesh = new THREE.Mesh(somaGeo, somaMat);
-            somaMesh.position.set(
-                neuronData.soma[0] - centroid[0],
-                neuronData.soma[1] - centroid[1],
-                neuronData.soma[2] - centroid[2]
-            );
-            group.add(somaMesh);
-        }
-
         this.scene.add(group);
         this.currentGroup = group;
         this._fitCamera(neuronData);
