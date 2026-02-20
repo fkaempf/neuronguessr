@@ -177,8 +177,14 @@ async function startGame() {
         manifest = await loadOnlineManifest(getToken());
     } catch (err) {
         console.error('Failed to load manifest:', err);
-        $loadingText.textContent = `Error: ${err.message}`;
-        await new Promise(r => setTimeout(r, 2000));
+        const isAuth = err.message && (err.message.includes('401') || err.message.includes('jwt') || err.message.includes('credentials'));
+        if (isAuth) {
+            $loadingText.textContent = 'Token expired or invalid. Please sign in again.';
+            signOut();
+        } else {
+            $loadingText.textContent = `Error: ${err.message}`;
+        }
+        await new Promise(r => setTimeout(r, 2500));
         showScreen('screen-start');
         return;
     }
@@ -197,6 +203,14 @@ async function loadRound() {
         currentNeuronData = await loadOnlineNeuron(neuronMeta);
     } catch (err) {
         console.error(`Failed to load neuron ${neuronMeta.bodyId}:`, err);
+        const isAuth = err.message && (err.message.includes('401') || err.message.includes('jwt') || err.message.includes('credentials'));
+        if (isAuth) {
+            $loadingText.textContent = 'Token expired or invalid. Please sign in again.';
+            signOut();
+            await new Promise(r => setTimeout(r, 2500));
+            showScreen('screen-start');
+            return;
+        }
         $loadingText.textContent = 'Failed to load neuron. Retrying...';
         throw err;
     }
