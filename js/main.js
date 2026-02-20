@@ -87,9 +87,12 @@ const $btnDaily = document.getElementById('btn-daily');
 const $btnFreeplay = document.getElementById('btn-freeplay');
 const $dailyDate = document.getElementById('daily-date');
 const $dailyStatus = document.getElementById('daily-status');
+const $dailyStatusRow = document.getElementById('daily-status-row');
+const $btnShareStart = document.getElementById('btn-share-start');
 const $btnSubmit = document.getElementById('btn-submit');
 const $btnNext = document.getElementById('btn-next');
 const $btnReplay = document.getElementById('btn-replay');
+const $btnShare = document.getElementById('btn-share');
 const $btnToggleRoi = document.getElementById('btn-toggle-roi');
 const $btnToggleOrtho = document.getElementById('btn-toggle-ortho');
 const $resultTitle = document.getElementById('result-title');
@@ -192,10 +195,10 @@ function updateAuthUI() {
     // Check if daily already played
     const dailyPlayed = localStorage.getItem(`daily_played_${today}`);
     if (dailyPlayed) {
-        $dailyStatus.style.display = 'block';
+        $dailyStatusRow.style.display = 'flex';
         $dailyStatus.textContent = `Today's score: ${parseInt(dailyPlayed).toLocaleString()}`;
     } else {
-        $dailyStatus.style.display = 'none';
+        $dailyStatusRow.style.display = 'none';
     }
 }
 
@@ -435,6 +438,8 @@ function showFinalScore() {
 
     // Show final screen BEFORE moving canvas so container has real dimensions
     showScreen('screen-final');
+    $btnShare.style.display = gameMode === 'daily' ? 'inline-block' : 'none';
+    $btnShare.textContent = 'Share';
     moveBrainCanvas($finalBrainContainer);
     brainViewer.resetCamera();
 
@@ -514,6 +519,31 @@ $btnNext.addEventListener('click', nextRound);
 $btnReplay.addEventListener('click', () => {
     showScreen('screen-start');
     updateAuthUI();
+});
+$btnShare.addEventListener('click', async () => {
+    const stored = JSON.parse(localStorage.getItem(`daily_result_${manifest.date}`) || 'null');
+    if (!stored) return;
+    const text = generateShareText(stored.date, stored.totalScore, stored.roundScores);
+    try {
+        await shareText(text);
+        $btnShare.textContent = 'Copied!';
+        setTimeout(() => { $btnShare.textContent = 'Share'; }, 2000);
+    } catch {
+        // User cancelled share sheet or clipboard denied — silently ignore
+    }
+});
+$btnShareStart.addEventListener('click', async () => {
+    const today = new Date().toISOString().split('T')[0];
+    const stored = JSON.parse(localStorage.getItem(`daily_result_${today}`) || 'null');
+    if (!stored) return;
+    const text = generateShareText(stored.date, stored.totalScore, stored.roundScores);
+    try {
+        await shareText(text);
+        $btnShareStart.textContent = 'Copied!';
+        setTimeout(() => { $btnShareStart.textContent = 'Share'; }, 2000);
+    } catch {
+        // ignore
+    }
 });
 $btnSubmitScore.addEventListener('click', handleScoreSubmit);
 $playerName.addEventListener('keydown', (e) => {
