@@ -9,7 +9,8 @@ import { GameState, ROUNDS_PER_GAME } from './game-state.js';
 import { MAX_POINTS } from './scoring.js';
 import { loadNeuropilConfig, loadOBJText } from './data-loader.js';
 import { initAuth, isSignedIn, getToken, getUserEmail, setManualToken, signOut, onAuthChange } from './auth.js';
-import { loadOnlineManifest, loadOnlineNeuron } from './online-data-loader.js';
+import { loadOnlineManifest, loadDailyManifest, loadOnlineNeuron } from './online-data-loader.js';
+import { submitScore, fetchScores, renderLeaderboard, renderHistogram } from './leaderboard.js';
 import { showScreen, animateScore } from './ui.js';
 
 // --- State ---
@@ -18,6 +19,7 @@ let neuronViewer;
 let brainViewer;
 let manifest;
 let currentNeuronData;
+let gameMode = 'daily'; // 'daily' or 'freeplay'
 
 // Synapse slider: logarithmic mapping from slider (0-1000) to synapse count (10-200000)
 const SYNAPSE_MIN = 10;
@@ -37,7 +39,10 @@ function synapsesToSlider(count) {
 const $roundCounter = document.getElementById('round-counter');
 const $totalScore = document.getElementById('total-score');
 const $guessCoords = document.getElementById('guess-coords');
-const $btnStart = document.getElementById('btn-start');
+const $btnDaily = document.getElementById('btn-daily');
+const $btnFreeplay = document.getElementById('btn-freeplay');
+const $dailyDate = document.getElementById('daily-date');
+const $dailyStatus = document.getElementById('daily-status');
 const $btnSubmit = document.getElementById('btn-submit');
 const $btnNext = document.getElementById('btn-next');
 const $btnReplay = document.getElementById('btn-replay');
@@ -71,6 +76,12 @@ const $panelNeuron = document.getElementById('panel-neuron');
 const $panelBrain = document.getElementById('panel-brain');
 const $depthSliderRow = document.getElementById('depth-slider-row');
 const $depthSlider = document.getElementById('depth-slider');
+const $playerName = document.getElementById('player-name');
+const $btnSubmitScore = document.getElementById('btn-submit-score');
+const $scoreSubmitRow = document.getElementById('score-submit-row');
+const $leaderboardSection = document.getElementById('leaderboard-section');
+const $leaderboardContainer = document.getElementById('leaderboard-container');
+const $histogramCanvas = document.getElementById('histogram-canvas');
 
 // Auth DOM refs
 const $authNotSignedIn = document.getElementById('auth-not-signed-in');
@@ -120,12 +131,27 @@ function updateAuthUI() {
         $authNotSignedIn.style.display = 'none';
         $authSignedIn.style.display = 'flex';
         $authEmail.textContent = getUserEmail() || '';
-        $btnStart.disabled = false;
+        $btnDaily.disabled = false;
+        $btnFreeplay.disabled = false;
     } else {
         $authNotSignedIn.style.display = 'block';
         $authSignedIn.style.display = 'none';
         $authEmail.textContent = '';
-        $btnStart.disabled = true;
+        $btnDaily.disabled = true;
+        $btnFreeplay.disabled = true;
+    }
+
+    // Show today's date on daily button
+    const today = new Date().toISOString().split('T')[0];
+    $dailyDate.textContent = today;
+
+    // Check if daily already played
+    const dailyPlayed = localStorage.getItem(`daily_played_${today}`);
+    if (dailyPlayed) {
+        $dailyStatus.style.display = 'block';
+        $dailyStatus.textContent = `Today's score: ${parseInt(dailyPlayed).toLocaleString()}`;
+    } else {
+        $dailyStatus.style.display = 'none';
     }
 }
 
@@ -193,11 +219,20 @@ function showMobilePanel(panel) {
 }
 
 // --- Game Flow ---
-async function startGame() {
+async function startGame(mode = 'daily') {
+    gameMode = mode;
     showScreen('screen-loading');
-    $loadingText.textContent = 'Querying neuPrint for neurons...';
+
+    if (mode === 'daily') {
+        $loadingText.textContent = 'Loading daily challenge...';
+    } else {
+        $loadingText.textContent = 'Querying neuPrint for neurons...';
+    }
+
     try {
-        manifest = await loadOnlineManifest(getToken());
+        manifest = mode === 'daily'
+            ? await loadDailyManifest(getToken())
+            : await loadOnlineManifest(getToken());
     } catch (err) {
         console.error('Failed to load manifest:', err);
         const isAuth = err.message && (err.message.includes('401') || err.message.includes('jwt') || err.message.includes('credentials'));
@@ -344,6 +379,16 @@ function showFinalScore() {
     `;
     }).join('');
 
+    // Reset leaderboard UI
+    $scoreSubmitRow.style.display = 'flex';
+    $btnSubmitScore.disabled = false;
+    $btnSubmitScore.textContent = 'Submit Score';
+    $leaderboardSection.style.display = 'none';
+
+    // Restore saved player name
+    const savedName = localStorage.getItem('player_name');
+    if (savedName) $playerName.value = savedName;
+
     // Show final screen BEFORE moving canvas so container has real dimensions
     showScreen('screen-final');
     moveBrainCanvas($finalBrainContainer);
@@ -351,13 +396,74 @@ function showFinalScore() {
 
     // Animate score after screen is visible
     requestAnimationFrame(() => animateScore($finalScore, gameState.totalScore, 1200));
+
+    // Auto-load leaderboard
+    loadLeaderboard();
+}
+
+// --- Leaderboard ---
+async function loadLeaderboard() {
+    const date = manifest?.date || new Date().toISOString().split('T')[0];
+    try {
+        const data = await fetchScores(gameMode, date);
+        if (data.scores && data.scores.length > 0) {
+            $leaderboardSection.style.display = 'block';
+            renderLeaderboard($leaderboardContainer, data.scores, gameState.totalScore);
+            renderHistogram($histogramCanvas, data.scores, gameState.totalScore);
+        }
+    } catch (err) {
+        console.error('Failed to load leaderboard:', err);
+    }
+}
+
+async function handleScoreSubmit() {
+    const name = $playerName.value.trim();
+    if (!name) { $playerName.focus(); return; }
+
+    localStorage.setItem('player_name', name);
+    $btnSubmitScore.disabled = true;
+    $btnSubmitScore.textContent = 'Submitting...';
+
+    const date = manifest?.date || new Date().toISOString().split('T')[0];
+    const roundScoresData = gameState.roundScores.map(r => ({
+        score: r.score,
+        locationScore: r.locationScore,
+        synapseScore: r.synapseScore,
+        distance: r.distance,
+    }));
+
+    try {
+        const result = await submitScore(gameMode, date, name, gameState.totalScore, roundScoresData);
+        if (result.error) {
+            $btnSubmitScore.textContent = result.error;
+        } else {
+            $scoreSubmitRow.style.display = 'none';
+            // Save daily completion
+            if (gameMode === 'daily') {
+                localStorage.setItem(`daily_played_${date}`, String(gameState.totalScore));
+            }
+        }
+        await loadLeaderboard();
+    } catch (err) {
+        console.error('Score submit failed:', err);
+        $btnSubmitScore.textContent = 'Failed - Retry';
+        $btnSubmitScore.disabled = false;
+    }
 }
 
 // --- Event Listeners ---
-$btnStart.addEventListener('click', () => startGame());
+$btnDaily.addEventListener('click', () => startGame('daily'));
+$btnFreeplay.addEventListener('click', () => startGame('freeplay'));
 $btnSubmit.addEventListener('click', submitGuess);
 $btnNext.addEventListener('click', nextRound);
-$btnReplay.addEventListener('click', () => startGame());
+$btnReplay.addEventListener('click', () => {
+    showScreen('screen-start');
+    updateAuthUI();
+});
+$btnSubmitScore.addEventListener('click', handleScoreSubmit);
+$playerName.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') handleScoreSubmit();
+});
 
 // Auth event listeners
 $btnSetToken.addEventListener('click', () => {

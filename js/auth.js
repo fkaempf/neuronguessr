@@ -2,7 +2,7 @@
  * Authentication module for NeuronGuessr online mode.
  *
  * Players paste their neuPrint API token to authenticate.
- * Tokens are stored in sessionStorage for the browser session.
+ * Tokens are stored in localStorage so they persist across sessions.
  */
 
 let _token = null;
@@ -13,10 +13,10 @@ let _authChangeCallbacks = [];
  * Initialize auth state from saved session.
  */
 export function initAuth() {
-    const saved = sessionStorage.getItem('neuprint_token');
+    const saved = localStorage.getItem('neuprint_token');
     if (saved) {
         _token = saved;
-        _userEmail = sessionStorage.getItem('neuprint_email') || 'authenticated';
+        _userEmail = localStorage.getItem('neuprint_email') || 'authenticated';
         _notifyChange();
     }
 }
@@ -65,8 +65,8 @@ export function setManualToken(token) {
     // Strip non-ASCII characters (BOM, smart quotes, etc. from copy-paste)
     _token = token.trim().replace(/[^\x20-\x7E]/g, '');
     _userEmail = 'token user';
-    sessionStorage.setItem('neuprint_token', _token);
-    sessionStorage.setItem('neuprint_email', _userEmail);
+    localStorage.setItem('neuprint_token', _token);
+    localStorage.setItem('neuprint_email', _userEmail);
     _notifyChange();
 }
 
@@ -76,8 +76,8 @@ export function setManualToken(token) {
 export function signOut() {
     _token = null;
     _userEmail = null;
-    sessionStorage.removeItem('neuprint_token');
-    sessionStorage.removeItem('neuprint_email');
+    localStorage.removeItem('neuprint_token');
+    localStorage.removeItem('neuprint_email');
 
     _notifyChange();
 }

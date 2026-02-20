@@ -176,6 +176,12 @@ function _downsampleSkeleton(rows) {
 function _parseSoma(somaLocation) {
     if (!somaLocation) return null;
 
+    // neuPrint may return somaLocation as a JSON string
+    if (typeof somaLocation === 'string') {
+        try { somaLocation = JSON.parse(somaLocation); }
+        catch { return null; }
+    }
+
     if (Array.isArray(somaLocation) && somaLocation.length >= 3) {
         return [somaLocation[0], somaLocation[1], somaLocation[2]];
     }

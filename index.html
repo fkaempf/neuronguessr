@@ -60,11 +60,22 @@
                 </div>
             </div>
 
-            <button id="btn-start" class="btn-primary" disabled>Play</button>
+            <div class="mode-selector" id="mode-selector">
+                <button id="btn-daily" class="btn-mode" disabled>
+                    <span class="mode-title">Daily Challenge</span>
+                    <span class="mode-desc">Today's 5 neurons &middot; Compare scores</span>
+                    <span id="daily-date" class="mode-date"></span>
+                </button>
+                <button id="btn-freeplay" class="btn-mode" disabled>
+                    <span class="mode-title">Free Play</span>
+                    <span class="mode-desc">Random neurons every time</span>
+                </button>
+            </div>
+            <p id="daily-status" class="daily-status" style="display:none;"></p>
 
             <button id="btn-scoring" class="btn-link">How Scoring Works</button>
             <p class="privacy-note">
-                Your API token is sent only to neuPrint (via our <a href="https://github.com/fkaempf/neuronguessr/blob/main/cors-proxy/worker.js" target="_blank" rel="noopener">open-source CORS proxy</a>) and stored in your browser's session storage. It is never logged or shared.
+                Your API token is sent only to neuPrint (via our <a href="https://github.com/fkaempf/neuronguessr/blob/main/cors-proxy/worker.js" target="_blank" rel="noopener">open-source CORS proxy</a>) and stored in your browser's local storage. It is never logged or shared.
             </p>
             <p class="credit">
                 Data: <em>Drosophila</em> Male CNS Connectome via <a href="https://neuprint.janelia.org" target="_blank" rel="noopener">neuPrint</a> &amp; <a href="https://github.com/janelia-flyem/dvid" target="_blank" rel="noopener">DVID</a>
@@ -224,6 +235,15 @@
                     <div id="final-score" class="big-score">0</div>
                     <p class="final-subtitle">out of 50,000</p>
                     <div id="round-breakdown"></div>
+                    <div id="score-submit-row" class="score-submit-row">
+                        <input type="text" id="player-name" class="player-name-input" placeholder="Your name" maxlength="20">
+                        <button id="btn-submit-score" class="btn-primary btn-submit-score">Submit Score</button>
+                    </div>
+                    <div id="leaderboard-section" class="leaderboard-section" style="display:none;">
+                        <h3 class="leaderboard-title">Leaderboard</h3>
+                        <div id="leaderboard-container"></div>
+                        <canvas id="histogram-canvas" class="histogram-canvas" width="400" height="120"></canvas>
+                    </div>
                     <button id="btn-replay" class="btn-primary">Play Again</button>
                 </div>
             </div>

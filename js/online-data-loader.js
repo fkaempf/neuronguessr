@@ -9,7 +9,7 @@
 
 import { queryRandomNeurons, fetchSkeleton, setToken } from './neuprint-client.js';
 import { parseSkeletonToNeuron } from './swc-parser.js';
-import { DVID_BASE, DVID_NODE } from './config.js';
+import { PROXY_BASE, DVID_BASE, DVID_NODE } from './config.js';
 
 // Dataset constants (same as in the static manifest)
 const BRAIN_BOUNDS = {
@@ -45,6 +45,42 @@ export async function loadOnlineManifest(token, poolSize = 30) {
         neurons: manifestNeurons,
         brainBounds: BRAIN_BOUNDS,
         maxDistance: MAX_DISTANCE,
+    };
+}
+
+/**
+ * Load the daily challenge manifest from the backend.
+ *
+ * @param {string} token - Auth token for skeleton/mesh fetching
+ * @returns {Promise<Object>} - Manifest-shaped object
+ */
+export async function loadDailyManifest(token) {
+    setToken(token);
+
+    const resp = await fetch(`${PROXY_BASE}/api/daily`);
+    if (!resp.ok) {
+        const text = await resp.text();
+        throw new Error(`Daily challenge failed (${resp.status}): ${text}`);
+    }
+
+    const { date, neurons } = await resp.json();
+
+    const manifestNeurons = neurons.map(n => ({
+        file: `daily_${date}_${n.bodyId}`,
+        bodyId: n.bodyId,
+        id: n.bodyId,
+        type: n.type,
+        region: n.region,
+        nodeCount: 0,
+        _metadata: n,
+    }));
+
+    return {
+        count: manifestNeurons.length,
+        neurons: manifestNeurons,
+        brainBounds: BRAIN_BOUNDS,
+        maxDistance: MAX_DISTANCE,
+        date,
     };
 }
 
