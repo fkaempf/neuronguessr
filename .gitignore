@@ -9,7 +9,7 @@ Thumbs.db
 .env
 .env.local
 .env.*.local
-js/config.js
+# js/config.js
 
 # Build output
 dist/
