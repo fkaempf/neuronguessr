@@ -397,6 +397,14 @@ function showFinalScore() {
     // Animate score after screen is visible
     requestAnimationFrame(() => animateScore($finalScore, gameState.totalScore, 1200));
 
+    // Save full daily result for re-show and sharing
+    if (gameMode === 'daily' && manifest?.date) {
+        localStorage.setItem(
+            `daily_result_${manifest.date}`,
+            JSON.stringify({ totalScore: gameState.totalScore, roundScores: gameState.roundScores, date: manifest.date })
+        );
+    }
+
     // Auto-load leaderboard
     loadLeaderboard();
 }
