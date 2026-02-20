@@ -70,9 +70,12 @@
                 Data: <em>Drosophila</em> Male CNS Connectome via <a href="https://neuprint.janelia.org" target="_blank" rel="noopener">neuPrint</a> &amp; <a href="https://github.com/janelia-flyem/dvid" target="_blank" rel="noopener">DVID</a>
                 <button id="btn-info-toggle" class="info-toggle" aria-label="Show tech info" title="Tech info">i</button>
             </p>
-            <p id="tech-stack" class="tech-stack" style="display:none;">
-                Built with <a href="https://threejs.org" target="_blank" rel="noopener">Three.js</a> &middot; Vanilla JS &middot; No build step
-            </p>
+            <div id="tech-stack" class="tech-stack" style="display:none;">
+                3D neuron meshes from <a href="https://github.com/janelia-flyem/dvid" target="_blank" rel="noopener">DVID</a> (neuroglancer precomputed format) &middot;
+                Synapse counts &amp; metadata queried live from <a href="https://neuprint.janelia.org" target="_blank" rel="noopener">neuPrint</a> via Cypher &middot;
+                Brain neuropil meshes from static OBJ/PLY files &middot;
+                Rendered with <a href="https://threejs.org" target="_blank" rel="noopener">Three.js</a> &middot; Vanilla JS &middot; No build step
+            </div>
         </div>
     </div>
 
