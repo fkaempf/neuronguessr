@@ -50,7 +50,7 @@
                     </ol>
                     <div class="token-input-row">
                         <input type="password" id="neuprint-token" placeholder="Paste your neuPrint API token" class="token-input">
-                        <button id="btn-set-token" class="btn-small">Set Token</button>
+                        <button id="btn-set-token" class="btn-token-set">Set Token</button>
                     </div>
                 </div>
                 <div id="auth-signed-in" class="auth-status" style="display:none;">
@@ -115,8 +115,13 @@
             <!-- Right: Brain guess panel -->
             <div id="panel-brain" class="panel">
                 <div id="brain-canvas-container" class="canvas-container"></div>
+                <div id="depth-slider-row" class="depth-slider-row" style="display:none;">
+                    <label class="depth-label">Depth:</label>
+                    <input type="range" id="depth-slider" min="-500" max="500" value="0" step="1">
+                </div>
                 <div class="panel-label">
-                    Click to place guess, Shift+scroll to adjust depth
+                    <span class="panel-label-desktop">Click to place guess, Shift+scroll to adjust depth</span>
+                    <span class="panel-label-mobile">Tap to place guess</span>
                     <span id="guess-coords" class="coords-display"></span>
                     <button id="btn-toggle-roi" class="btn-small">Show Brain Regions</button>
                     <button id="btn-toggle-ortho" class="btn-small">Perspective View</button>

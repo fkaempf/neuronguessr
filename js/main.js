@@ -69,6 +69,8 @@ const $btnShowNeuron = document.getElementById('btn-show-neuron');
 const $btnShowBrain = document.getElementById('btn-show-brain');
 const $panelNeuron = document.getElementById('panel-neuron');
 const $panelBrain = document.getElementById('panel-brain');
+const $depthSliderRow = document.getElementById('depth-slider-row');
+const $depthSlider = document.getElementById('depth-slider');
 
 // Auth DOM refs
 const $authNotSignedIn = document.getElementById('auth-not-signed-in');
@@ -246,6 +248,10 @@ async function loadRound() {
     brainViewer.clearGuess();
     brainViewer.resetCamera();
 
+    // Reset depth slider
+    $depthSliderRow.style.display = 'none';
+    $depthSlider.value = 0;
+
     // Update HUD
     $roundCounter.textContent = `Round ${gameState.currentRound + 1} / ${ROUNDS_PER_GAME}`;
     $totalScore.textContent = `Score: ${gameState.totalScore.toLocaleString()}`;
@@ -263,6 +269,11 @@ function onGuessPlaced(position) {
     gameState.setGuess(position);
     updateSubmitButton();
     $guessCoords.textContent = `(${position[0].toFixed(0)}, ${position[1].toFixed(0)}, ${position[2].toFixed(0)})`;
+
+    // Show depth slider on mobile when guess is placed
+    if (window.innerWidth <= 768) {
+        $depthSliderRow.style.display = 'flex';
+    }
 }
 
 function submitGuess() {
@@ -374,6 +385,16 @@ $btnResetView.addEventListener('click', () => brainViewer.resetCamera());
 $btnResetNeuron.addEventListener('click', () => neuronViewer.resetCamera());
 $btnShowNeuron.addEventListener('click', () => showMobilePanel('neuron'));
 $btnShowBrain.addEventListener('click', () => showMobilePanel('brain'));
+
+// Depth slider for mobile (replaces Shift+scroll)
+$depthSlider.addEventListener('input', () => {
+    const val = parseInt($depthSlider.value);
+    // Reset to 0 first, then set to target (adjustDepth is relative)
+    if (brainViewer._guessDepthTarget !== undefined) {
+        const delta = val * 30 - brainViewer._guessDepthTarget;
+        brainViewer.adjustDepth(delta);
+    }
+});
 
 // Arrow keys / = / - for depth adjustment
 document.onkeydown = function(e) {
