@@ -35,6 +35,50 @@ function synapsesToSlider(count) {
     return Math.round(t * 1000);
 }
 
+// --- Share helpers ---
+
+/**
+ * Convert a dimension score (0–5000) to 3 emoji blocks.
+ * Thresholds at 20% / 50% / 85% of max.
+ * 🟩 = reached, 🟨 = within 60% of threshold, ⬛ = below.
+ */
+function scoreToBlocks(score, max = 5000) {
+    const thresholds = [max * 0.20, max * 0.50, max * 0.85]; // 1000, 2500, 4250
+    return thresholds.map(t => {
+        if (score >= t) return '🟩';
+        if (score >= t * 0.6) return '🟨';
+        return '⬛';
+    }).join('');
+}
+
+/**
+ * Generate a Wordle-style share text for a completed daily game.
+ * @param {string} date - ISO date string e.g. "2026-02-20"
+ * @param {number} totalScore
+ * @param {Array} roundScores - gameState.roundScores array
+ * @returns {string}
+ */
+function generateShareText(date, totalScore, roundScores) {
+    const header = `NeuronGuessr ${date} ${totalScore.toLocaleString()}/50,000`;
+    const rows = roundScores.map(r =>
+        `📍${scoreToBlocks(r.locationScore)} ⚡${scoreToBlocks(r.synapseScore)}`
+    ).join('\n');
+    const url = window.location.origin;
+    return `${header}\n${rows}\n${url}`;
+}
+
+/**
+ * Copy text to clipboard, using Web Share API on mobile if available.
+ * Returns a promise that resolves when done.
+ */
+async function shareText(text) {
+    if (navigator.share) {
+        await navigator.share({ text });
+    } else {
+        await navigator.clipboard.writeText(text);
+    }
+}
+
 // --- DOM refs ---
 const $roundCounter = document.getElementById('round-counter');
 const $totalScore = document.getElementById('total-score');
