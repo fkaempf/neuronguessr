@@ -50,7 +50,10 @@ export class BrainViewer {
         this.controls = new OrbitControls(this.camera, this.renderer.domElement);
         this.controls.enableDamping = true;
         this.controls.dampingFactor = 0.1;
-        this.controls.panSpeed = 0.4; // reduce pan sensitivity (especially for ortho)
+        this.controls.panSpeed = 0.4;
+        // Prevent camera from flipping upside down (causes inverted controls)
+        this.controls.minPolarAngle = 0.05;
+        this.controls.maxPolarAngle = Math.PI - 0.05;
 
         // Lighting
         this.scene.add(new THREE.AmbientLight(0xffffff, 0.6));
