@@ -86,6 +86,13 @@ export class BrainViewer {
         this._guessDepthTarget = 0;      // target depth (for smooth lerp)
         this._depthGuideLine = null;     // dotted line showing depth axis
 
+        // Scale bar overlay
+        this._scaleBarEl = document.createElement('div');
+        this._scaleBarEl.className = 'scale-bar';
+        this._scaleBarEl.innerHTML = '<div class="scale-bar-line"></div><span class="scale-bar-label">100 μm</span>';
+        container.style.position = 'relative';
+        container.appendChild(this._scaleBarEl);
+
         // Click-vs-drag detection: only place guess on clean clicks, not drags
         this._pointerDownPos = null;
 
@@ -738,7 +745,31 @@ export class BrainViewer {
             this._hideDepthGuide();
         }
 
+        this._updateScaleBar();
         this.renderer.render(this.scene, this.camera);
+    }
+
+    /**
+     * Update the scale bar width to represent 100μm at current zoom.
+     * 1 voxel unit = 8nm, so 100μm = 12500 units.
+     */
+    _updateScaleBar() {
+        if (!this._scaleBarEl || !this._brainCenter) return;
+        const SCALE_UNITS = 12500; // 100μm in 8nm voxel units
+
+        // Project two points separated by SCALE_UNITS in screen space
+        const p1 = this._brainCenter.clone();
+        const p2 = this._brainCenter.clone();
+        p2.x += SCALE_UNITS;
+
+        p1.project(this.camera);
+        p2.project(this.camera);
+
+        const w = this.renderer.domElement.clientWidth;
+        const px = Math.abs((p2.x - p1.x) * 0.5 * w);
+
+        const line = this._scaleBarEl.querySelector('.scale-bar-line');
+        if (line) line.style.width = Math.max(20, Math.min(px, 200)) + 'px';
     }
 
     _onResize() {
