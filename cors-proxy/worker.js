@@ -228,6 +228,14 @@ async function submitScore(request, env) {
     const ttl = mode === 'daily' ? 2592000 : 604800;
     await env.SCORES.put(scoreKey, JSON.stringify(existing), { expirationTtl: ttl });
 
+    // Append to all-time histogram (just scores, no names, capped at 10000)
+    const histKey = `histogram:${mode}`;
+    const allScores = await env.SCORES.get(histKey, 'json') || [];
+    allScores.push(score);
+    // Keep only last 10000 scores to avoid unbounded growth
+    if (allScores.length > 10000) allScores.splice(0, allScores.length - 10000);
+    await env.SCORES.put(histKey, JSON.stringify(allScores));
+
     // Update rate limit (expires end of day)
     await env.SCORES.put(rateKey, String(rateCount + 1), { expirationTtl: 86400 });
 
@@ -246,7 +254,11 @@ async function getScores(url, env) {
     const scoreKey = `scores:${mode}:${date}`;
     const scores = await env.SCORES.get(scoreKey, 'json') || [];
 
-    return corsJson({ mode, date, scores, total: scores.length });
+    // All-time histogram scores
+    const histKey = `histogram:${mode}`;
+    const allTimeScores = await env.SCORES.get(histKey, 'json') || [];
+
+    return corsJson({ mode, date, scores, total: scores.length, allTimeScores });
 }
 
 // ---------- Main handler ----------

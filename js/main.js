@@ -408,7 +408,10 @@ async function loadLeaderboard() {
         const data = await fetchScores(gameMode, date);
         $leaderboardSection.style.display = 'block';
         renderLeaderboard($leaderboardContainer, data.scores || [], gameState.totalScore);
-        renderHistogram($histogramCanvas, data.scores || [], gameState.totalScore);
+        // Use all-time scores for histogram
+        const histScores = (data.allTimeScores || []).map(s => ({ score: s }));
+        histScores.push({ score: gameState.totalScore }); // include current game
+        renderHistogram($histogramCanvas, histScores, gameState.totalScore);
     } catch (err) {
         console.error('Failed to load leaderboard:', err);
         $leaderboardSection.style.display = 'block';
