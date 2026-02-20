@@ -617,7 +617,10 @@ export class BrainViewer {
         if (!this._brainSize) return;
         const parent = this.renderer.domElement.parentElement;
         if (!parent) return;
-        const aspect = parent.clientWidth / parent.clientHeight;
+        const w = parent.clientWidth;
+        const h = parent.clientHeight;
+        if (w === 0 || h === 0) return;
+        const aspect = w / h;
         const maxDim = Math.max(this._brainSize.x, this._brainSize.y, this._brainSize.z);
         const halfH = maxDim * 0.7;
         const halfW = halfH * aspect;

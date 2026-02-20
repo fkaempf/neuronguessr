@@ -126,6 +126,8 @@ function updateAuthUI() {
 function moveBrainCanvas(targetContainer) {
     const canvas = brainViewer.renderer.domElement;
     targetContainer.appendChild(canvas);
+    // Force layout reflow so container dimensions are available
+    void targetContainer.offsetHeight;
     brainViewer._onResize();
 }
 
@@ -183,14 +185,10 @@ async function startGame() {
 
     gameState.startNewGame(manifest.neurons);
     brainViewer.clearOverview();
-    moveBrainCanvas($brainCanvasContainer);
-    showScreen('screen-game');
     await loadRound();
 }
 
 async function loadRound() {
-    moveBrainCanvas($brainCanvasContainer);
-
     const neuronMeta = gameState.getCurrentNeuronMeta();
 
     showScreen('screen-loading');
@@ -202,7 +200,10 @@ async function loadRound() {
         $loadingText.textContent = 'Failed to load neuron. Retrying...';
         throw err;
     }
+
+    // Show game screen BEFORE moving canvas so container has real dimensions
     showScreen('screen-game');
+    moveBrainCanvas($brainCanvasContainer);
 
     neuronViewer.displayNeuron(currentNeuronData);
 
@@ -238,12 +239,9 @@ function submitGuess() {
 
     // Show answer on brain (uses whichever hemisphere was closer)
     brainViewer.showAnswer(result.usedAnswer, currentNeuronData, midlineX);
-    moveBrainCanvas($resultBrainContainer);
-    brainViewer.resetCamera();
 
-    // Populate result card
+    // Populate result card (before showing screen so content is ready)
     $resultTitle.textContent = `Round ${gameState.currentRound + 1} Result`;
-    animateScore($resultScore, result.score);
     $resultLocScore.textContent = `Location: ${result.locationScore.toLocaleString()}`;
     $resultSynScore.textContent = `Synapses: ${result.synapseScore.toLocaleString()}`;
 
@@ -259,7 +257,14 @@ function submitGuess() {
     $totalScoreResult.textContent = `Score: ${gameState.totalScore.toLocaleString()}`;
 
     $btnNext.textContent = gameState.isGameOver() ? 'See Final Score' : 'Next Round';
+
+    // Show result screen BEFORE moving canvas so container has real dimensions
     showScreen('screen-result');
+    moveBrainCanvas($resultBrainContainer);
+    brainViewer.resetCamera();
+
+    // Animate score after screen is visible
+    requestAnimationFrame(() => animateScore($resultScore, result.score));
 }
 
 async function nextRound() {
@@ -267,7 +272,6 @@ async function nextRound() {
     if (phase === 'final') {
         showFinalScore();
     } else {
-        showScreen('screen-game');
         await loadRound();
     }
 }
@@ -276,11 +280,8 @@ function showFinalScore() {
     // Show all guesses on the brain
     brainViewer.clearGuess();
     brainViewer.showAllRounds(gameState.roundScores);
-    moveBrainCanvas($finalBrainContainer);
-    brainViewer.resetCamera();
 
-    animateScore($finalScore, gameState.totalScore, 1200);
-
+    // Populate breakdown before showing screen
     $roundBreakdown.innerHTML = gameState.roundScores.map((r, i) => {
         const distUm = r.distance * 8 / 1000;
         return `
@@ -296,7 +297,13 @@ function showFinalScore() {
     `;
     }).join('');
 
+    // Show final screen BEFORE moving canvas so container has real dimensions
     showScreen('screen-final');
+    moveBrainCanvas($finalBrainContainer);
+    brainViewer.resetCamera();
+
+    // Animate score after screen is visible
+    requestAnimationFrame(() => animateScore($finalScore, gameState.totalScore, 1200));
 }
 
 // --- Event Listeners ---
