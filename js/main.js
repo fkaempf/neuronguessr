@@ -266,6 +266,22 @@ function showMobilePanel(panel) {
 }
 
 // --- Game Flow ---
+
+/**
+ * Re-display the final score screen from a previously completed daily game.
+ * Reads stored result from localStorage and reconstructs the final screen.
+ * @param {Object} stored - { totalScore, roundScores, date }
+ */
+function showStoredDailyResult(stored) {
+    gameMode = 'daily';
+    manifest = { date: stored.date, brainBounds: { min: [0,0,0], max: [0,0,0] }, maxDistance: 1, neurons: [] };
+    gameState.totalScore = stored.totalScore;
+    gameState.roundScores = stored.roundScores;
+    showFinalScore();
+    // Hide score submit row — they've already played
+    $scoreSubmitRow.style.display = 'none';
+}
+
 async function startGame(mode = 'daily') {
     gameMode = mode;
     showScreen('screen-loading');
@@ -512,7 +528,15 @@ async function handleScoreSubmit() {
 }
 
 // --- Event Listeners ---
-$btnDaily.addEventListener('click', () => startGame('daily'));
+$btnDaily.addEventListener('click', () => {
+    const today = new Date().toISOString().split('T')[0];
+    const stored = JSON.parse(localStorage.getItem(`daily_result_${today}`) || 'null');
+    if (stored) {
+        showStoredDailyResult(stored);
+    } else {
+        startGame('daily');
+    }
+});
 $btnFreeplay.addEventListener('click', () => startGame('freeplay'));
 $btnSubmit.addEventListener('click', submitGuess);
 $btnNext.addEventListener('click', nextRound);
