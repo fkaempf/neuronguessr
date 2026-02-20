@@ -100,6 +100,86 @@ body {
     color: #555;
     margin-top: 32px;
 }
+.credit a {
+    color: #666;
+}
+
+/* === Auth Section === */
+.auth-section {
+    margin-bottom: 16px;
+    text-align: center;
+}
+
+/* === Token Tutorial === */
+.token-tutorial {
+    text-align: left;
+    max-width: 420px;
+    margin: 0 auto;
+}
+
+.tutorial-intro {
+    font-size: 14px;
+    color: #999;
+    line-height: 1.6;
+    margin-bottom: 12px;
+}
+.tutorial-intro a {
+    color: #00BCD4;
+}
+
+.tutorial-steps {
+    font-size: 13px;
+    color: #bbb;
+    line-height: 1.8;
+    margin: 0 0 16px 20px;
+    padding: 0;
+}
+.tutorial-steps a {
+    color: #00BCD4;
+}
+.tutorial-steps strong {
+    color: #ddd;
+}
+
+.token-input-row {
+    display: flex;
+    gap: 8px;
+}
+
+.token-input {
+    background: #1a1a2e;
+    border: 1px solid #444;
+    color: #e0e0e0;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    flex: 1;
+}
+.token-input:focus {
+    outline: none;
+    border-color: #00BCD4;
+}
+
+.auth-status {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+.auth-badge {
+    background: #1b5e20;
+    color: #81c784;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.auth-email {
+    font-size: 12px;
+    color: #888;
+}
 
 /* === Loading Screen === */
 .loading-content {

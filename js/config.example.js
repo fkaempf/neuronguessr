@@ -1,0 +1,13 @@
+/**
+ * NeuronGuessr configuration.
+ *
+ * Copy this file to config.js and fill in your deployment values.
+ *
+ *   cp js/config.example.js js/config.js
+ */
+
+/** Base URL of your deployed CORS proxy (Cloudflare Worker) for neuPrint API requests. */
+export const PROXY_BASE = '';
+
+/** neuPrint dataset identifier. */
+export const DATASET = 'male-cns:v0.9';

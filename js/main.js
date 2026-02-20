@@ -7,7 +7,9 @@ import { NeuronViewer } from './neuron-viewer.js';
 import { BrainViewer } from './brain-viewer.js';
 import { GameState, ROUNDS_PER_GAME } from './game-state.js';
 import { MAX_POINTS } from './scoring.js';
-import { loadManifest, loadNeuron, loadNeuropilConfig, loadOBJText } from './data-loader.js';
+import { loadNeuropilConfig, loadOBJText } from './data-loader.js';
+import { initAuth, isSignedIn, getToken, getUserEmail, setManualToken, signOut, onAuthChange } from './auth.js';
+import { loadOnlineManifest, loadOnlineNeuron } from './online-data-loader.js';
 import { showScreen, animateScore } from './ui.js';
 
 // --- State ---
@@ -64,14 +66,20 @@ const $finalBrainContainer = document.getElementById('final-brain-container');
 const $btnResetView = document.getElementById('btn-reset-view');
 const $btnResetNeuron = document.getElementById('btn-reset-neuron');
 
+// Auth DOM refs
+const $authNotSignedIn = document.getElementById('auth-not-signed-in');
+const $authSignedIn = document.getElementById('auth-signed-in');
+const $authEmail = document.getElementById('auth-email');
+const $neuprintToken = document.getElementById('neuprint-token');
+const $btnSetToken = document.getElementById('btn-set-token');
+const $btnSignOut = document.getElementById('btn-sign-out');
+
 // --- Initialization ---
 async function init() {
     showScreen('screen-loading');
-    $loadingText.textContent = 'Loading neuron database...';
+    $loadingText.textContent = 'Loading brain model...';
 
     try {
-        manifest = await loadManifest();
-
         neuronViewer = new NeuronViewer(
             document.getElementById('neuron-canvas-container')
         );
@@ -88,10 +96,30 @@ async function init() {
         }).catch(() => {});
 
         brainViewer.resetCamera();
+
+        // Initialize auth and update UI
+        initAuth();
+        onAuthChange(updateAuthUI);
+        updateAuthUI();
+
         showScreen('screen-start');
     } catch (err) {
         console.error('Init failed:', err);
         $loadingText.textContent = `Error: ${err.message}. Check that data/ files exist.`;
+    }
+}
+
+function updateAuthUI() {
+    if (isSignedIn()) {
+        $authNotSignedIn.style.display = 'none';
+        $authSignedIn.style.display = 'flex';
+        $authEmail.textContent = getUserEmail() || '';
+        $btnStart.disabled = false;
+    } else {
+        $authNotSignedIn.style.display = 'block';
+        $authSignedIn.style.display = 'none';
+        $authEmail.textContent = '';
+        $btnStart.disabled = true;
     }
 }
 
@@ -141,6 +169,18 @@ function updateSubmitButton() {
 
 // --- Game Flow ---
 async function startGame() {
+    showScreen('screen-loading');
+    $loadingText.textContent = 'Querying neuPrint for neurons...';
+    try {
+        manifest = await loadOnlineManifest(getToken());
+    } catch (err) {
+        console.error('Failed to load manifest:', err);
+        $loadingText.textContent = `Error: ${err.message}`;
+        await new Promise(r => setTimeout(r, 2000));
+        showScreen('screen-start');
+        return;
+    }
+
     gameState.startNewGame(manifest.neurons);
     brainViewer.clearOverview();
     moveBrainCanvas($brainCanvasContainer);
@@ -151,8 +191,18 @@ async function startGame() {
 async function loadRound() {
     moveBrainCanvas($brainCanvasContainer);
 
-    const neuronFile = gameState.getCurrentNeuronFile();
-    currentNeuronData = await loadNeuron(neuronFile);
+    const neuronMeta = gameState.getCurrentNeuronMeta();
+
+    showScreen('screen-loading');
+    $loadingText.textContent = `Fetching neuron ${neuronMeta.bodyId}...`;
+    try {
+        currentNeuronData = await loadOnlineNeuron(neuronMeta);
+    } catch (err) {
+        console.error(`Failed to load neuron ${neuronMeta.bodyId}:`, err);
+        $loadingText.textContent = 'Failed to load neuron. Retrying...';
+        throw err;
+    }
+    showScreen('screen-game');
 
     neuronViewer.displayNeuron(currentNeuronData);
 
@@ -250,10 +300,25 @@ function showFinalScore() {
 }
 
 // --- Event Listeners ---
-$btnStart.addEventListener('click', startGame);
+$btnStart.addEventListener('click', () => startGame());
 $btnSubmit.addEventListener('click', submitGuess);
 $btnNext.addEventListener('click', nextRound);
-$btnReplay.addEventListener('click', startGame);
+$btnReplay.addEventListener('click', () => startGame());
+
+// Auth event listeners
+$btnSetToken.addEventListener('click', () => {
+    setManualToken($neuprintToken.value);
+    $neuprintToken.value = '';
+});
+$neuprintToken.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+        setManualToken($neuprintToken.value);
+        $neuprintToken.value = '';
+    }
+});
+$btnSignOut.addEventListener('click', () => {
+    signOut();
+});
 
 $btnToggleOrtho.addEventListener('click', () => {
     brainViewer.toggleProjection();

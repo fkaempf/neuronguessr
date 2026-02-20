@@ -3,6 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Guess where neurons belong in the fly brain. A GeoGuessr-style 3D neuroscience game.">
+    <meta property="og:title" content="NeuronGuessr">
+    <meta property="og:description" content="Guess where neurons belong in the fly brain. A GeoGuessr-style 3D neuroscience game.">
+    <meta property="og:type" content="website">
+    <meta name="theme-color" content="#0f0f23">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='22' r='3' fill='%234CAF50'/%3E%3Cline x1='16' y1='22' x2='16' y2='6' stroke='%234CAF50' stroke-width='2' stroke-linecap='round'/%3E%3Cline x1='16' y1='14' x2='8' y2='8' stroke='%234CAF50' stroke-width='1.5' stroke-linecap='round'/%3E%3Cline x1='16' y1='14' x2='24' y2='8' stroke='%234CAF50' stroke-width='1.5' stroke-linecap='round'/%3E%3Cline x1='8' y1='8' x2='5' y2='4' stroke='%234CAF50' stroke-width='1' stroke-linecap='round'/%3E%3Cline x1='8' y1='8' x2='10' y2='4' stroke='%234CAF50' stroke-width='1' stroke-linecap='round'/%3E%3Cline x1='24' y1='8' x2='22' y2='4' stroke='%234CAF50' stroke-width='1' stroke-linecap='round'/%3E%3Cline x1='24' y1='8' x2='27' y2='4' stroke='%234CAF50' stroke-width='1' stroke-linecap='round'/%3E%3Cline x1='16' y1='6' x2='13' y2='3' stroke='%234CAF50' stroke-width='1' stroke-linecap='round'/%3E%3Cline x1='16' y1='6' x2='19' y2='3' stroke='%234CAF50' stroke-width='1' stroke-linecap='round'/%3E%3Cline x1='16' y1='22' x2='12' y2='28' stroke='%234CAF50' stroke-width='1.5' stroke-linecap='round'/%3E%3Cline x1='16' y1='22' x2='20' y2='28' stroke='%234CAF50' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E">
     <title>NeuronGuessr</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
@@ -30,9 +36,35 @@
                     <span class="info-label">Perfect score</span>
                 </div>
             </div>
-            <button id="btn-start" class="btn-primary">Play</button>
+            <div id="auth-section" class="auth-section">
+                <div id="auth-not-signed-in" class="token-tutorial">
+                    <p class="tutorial-intro">
+                        This game uses live neuron data from
+                        <a href="https://neuprint.janelia.org" target="_blank" rel="noopener">neuPrint</a>,
+                        a database of the <em>Drosophila</em> connectome. You'll need a free API token to play.
+                    </p>
+                    <ol class="tutorial-steps">
+                        <li>Go to <a href="https://neuprint.janelia.org" target="_blank" rel="noopener">neuprint.janelia.org</a></li>
+                        <li>Sign in with your Google account</li>
+                        <li>Click your account icon (top-right) then <strong>AUTH_TOKEN</strong></li>
+                        <li>Copy the token and paste it below</li>
+                    </ol>
+                    <div class="token-input-row">
+                        <input type="password" id="neuprint-token" placeholder="Paste your neuPrint API token" class="token-input">
+                        <button id="btn-set-token" class="btn-small">Set Token</button>
+                    </div>
+                </div>
+                <div id="auth-signed-in" class="auth-status" style="display:none;">
+                    <span class="auth-badge">Authenticated</span>
+                    <span id="auth-email" class="auth-email"></span>
+                    <button id="btn-sign-out" class="btn-link">Sign out</button>
+                </div>
+            </div>
+
+            <button id="btn-start" class="btn-primary" disabled>Play</button>
+
             <button id="btn-scoring" class="btn-link">How Scoring Works</button>
-            <p class="credit">Data: <em>Drosophila</em> Male CNS Connectome</p>
+            <p class="credit">Data: <em>Drosophila</em> Male CNS Connectome via <a href="https://neuprint.janelia.org" target="_blank" rel="noopener">neuPrint</a></p>
         </div>
     </div>
 

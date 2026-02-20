@@ -1,0 +1,22 @@
+# Dependencies
+node_modules/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment/config (contains secrets)
+.env
+.env.local
+.env.*.local
+js/config.js
+
+# Build output
+dist/
+.cache/
+
+# Logs
+*.log
+
+# Editor files
+.claude.context/
