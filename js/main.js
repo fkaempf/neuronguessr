@@ -65,6 +65,10 @@ const $btnCloseScoring = document.getElementById('btn-close-scoring');
 const $finalBrainContainer = document.getElementById('final-brain-container');
 const $btnResetView = document.getElementById('btn-reset-view');
 const $btnResetNeuron = document.getElementById('btn-reset-neuron');
+const $btnShowNeuron = document.getElementById('btn-show-neuron');
+const $btnShowBrain = document.getElementById('btn-show-brain');
+const $panelNeuron = document.getElementById('panel-neuron');
+const $panelBrain = document.getElementById('panel-brain');
 
 // Auth DOM refs
 const $authNotSignedIn = document.getElementById('auth-not-signed-in');
@@ -169,6 +173,23 @@ function updateSubmitButton() {
     $btnSubmit.disabled = !gameState.currentGuess || !gameState.currentSynapseGuess;
 }
 
+// --- Mobile panel toggle ---
+function showMobilePanel(panel) {
+    if (panel === 'neuron') {
+        $panelNeuron.classList.remove('mobile-hidden');
+        $panelBrain.classList.add('mobile-hidden');
+        $btnShowNeuron.classList.add('active');
+        $btnShowBrain.classList.remove('active');
+        neuronViewer._onResize();
+    } else {
+        $panelBrain.classList.remove('mobile-hidden');
+        $panelNeuron.classList.add('mobile-hidden');
+        $btnShowBrain.classList.add('active');
+        $btnShowNeuron.classList.remove('active');
+        brainViewer._onResize();
+    }
+}
+
 // --- Game Flow ---
 async function startGame() {
     showScreen('screen-loading');
@@ -217,6 +238,7 @@ async function loadRound() {
 
     // Show game screen BEFORE moving canvas so container has real dimensions
     showScreen('screen-game');
+    showMobilePanel('neuron');
     moveBrainCanvas($brainCanvasContainer);
 
     neuronViewer.displayNeuron(currentNeuronData);
@@ -350,6 +372,8 @@ $btnToggleOrtho.addEventListener('click', () => {
 
 $btnResetView.addEventListener('click', () => brainViewer.resetCamera());
 $btnResetNeuron.addEventListener('click', () => neuronViewer.resetCamera());
+$btnShowNeuron.addEventListener('click', () => showMobilePanel('neuron'));
+$btnShowBrain.addEventListener('click', () => showMobilePanel('brain'));
 
 // Arrow keys / = / - for depth adjustment
 document.onkeydown = function(e) {

@@ -721,6 +721,30 @@ body {
     margin-bottom: 8px;
 }
 
+/* === Mobile Panel Toggle (hidden on desktop) === */
+.mobile-panel-toggle {
+    display: none;
+}
+
+.toggle-btn {
+    flex: 1;
+    padding: 10px 0;
+    font-size: 14px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+    background: #1a1a2e;
+    color: #666;
+    border-bottom: 2px solid transparent;
+}
+
+.toggle-btn.active {
+    color: #4CAF50;
+    border-bottom-color: #4CAF50;
+    background: rgba(76, 175, 80, 0.08);
+}
+
 /* === Responsive === */
 @media (max-width: 768px) {
     #game-panels,
@@ -759,5 +783,43 @@ body {
 
     .result-card {
         padding: 24px;
+    }
+
+    /* Show toggle bar on mobile */
+    .mobile-panel-toggle {
+        display: flex;
+        background: #0f0f23;
+        border-bottom: 1px solid #222;
+    }
+
+    /* Hide inactive panel on mobile */
+    .panel.mobile-hidden {
+        display: none;
+    }
+
+    /* Game actions: stack vertically on mobile */
+    #game-actions {
+        flex-direction: column;
+        gap: 10px;
+        padding: 10px 16px;
+    }
+
+    #synapse-slider {
+        width: 100%;
+    }
+
+    .synapse-guess-row {
+        width: 100%;
+    }
+
+    .panel-label {
+        font-size: 11px;
+        padding: 6px 10px;
+    }
+
+    .panel-label .btn-small {
+        margin-left: 6px;
+        font-size: 10px;
+        padding: 2px 6px;
     }
 }
