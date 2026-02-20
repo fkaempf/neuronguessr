@@ -197,6 +197,7 @@ function updateAuthUI() {
     if (dailyPlayed) {
         $dailyStatusRow.style.display = 'flex';
         $dailyStatus.textContent = `Today's score: ${parseInt(dailyPlayed).toLocaleString()}`;
+        $btnShareStart.style.display = localStorage.getItem(`daily_result_${today}`) ? 'inline-block' : 'none';
     } else {
         $dailyStatusRow.style.display = 'none';
     }
