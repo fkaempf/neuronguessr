@@ -36,8 +36,14 @@ export class NeuronViewer {
         this.controls.autoRotate = true;
         this.controls.autoRotateSpeed = 1.5;
 
-        // Lighting
-        this.scene.add(new THREE.AmbientLight(0xffffff, 0.8));
+        // Lighting (directional lights needed for mesh shading)
+        this.scene.add(new THREE.AmbientLight(0xffffff, 0.4));
+        const dirLight = new THREE.DirectionalLight(0xffffff, 0.6);
+        dirLight.position.set(1, 1, 1).normalize();
+        this.scene.add(dirLight);
+        const dirLight2 = new THREE.DirectionalLight(0xffffff, 0.3);
+        dirLight2.position.set(-1, -0.5, -1).normalize();
+        this.scene.add(dirLight2);
 
         // Current neuron group
         this.currentGroup = null;
@@ -52,8 +58,9 @@ export class NeuronViewer {
     }
 
     /**
-     * Display a neuron skeleton from preprocessed JSON data.
-     * @param {Object} neuronData - {nodes, edges, centroid, soma, bounds}
+     * Display a neuron from preprocessed data.
+     * Uses 3D mesh if available, falls back to skeleton lines.
+     * @param {Object} neuronData - {nodes, edges, centroid, soma, bounds, mesh?}
      */
     displayNeuron(neuronData) {
         // Clear previous
@@ -66,42 +73,60 @@ export class NeuronViewer {
         }
 
         const group = new THREE.Group();
-        const { nodes, edges, centroid } = neuronData;
+        const { centroid } = neuronData;
 
         // Random saturated color
         const hue = Math.random();
         const color = new THREE.Color().setHSL(hue, 0.85, 0.6);
 
-        // Build line segments (each edge = 2 vertices)
-        const positions = new Float32Array(edges.length * 6);
-        for (let i = 0; i < edges.length; i++) {
-            const [pIdx, cIdx] = edges[i];
-            const p = nodes[pIdx];
-            const c = nodes[cIdx];
-            // Center at origin by subtracting centroid
-            positions[i * 6 + 0] = p[0] - centroid[0];
-            positions[i * 6 + 1] = p[1] - centroid[1];
-            positions[i * 6 + 2] = p[2] - centroid[2];
-            positions[i * 6 + 3] = c[0] - centroid[0];
-            positions[i * 6 + 4] = c[1] - centroid[1];
-            positions[i * 6 + 5] = c[2] - centroid[2];
+        if (neuronData.mesh) {
+            // Render 3D mesh
+            const { vertices, indices } = neuronData.mesh;
+
+            // Center vertices at origin
+            const centered = new Float32Array(vertices.length);
+            for (let i = 0; i < vertices.length; i += 3) {
+                centered[i] = vertices[i] - centroid[0];
+                centered[i + 1] = vertices[i + 1] - centroid[1];
+                centered[i + 2] = vertices[i + 2] - centroid[2];
+            }
+
+            const geometry = new THREE.BufferGeometry();
+            geometry.setAttribute('position', new THREE.BufferAttribute(centered, 3));
+            geometry.setIndex(new THREE.BufferAttribute(indices, 1));
+            geometry.computeVertexNormals();
+
+            const material = new THREE.MeshPhongMaterial({
+                color,
+                shininess: 40,
+                side: THREE.DoubleSide,
+            });
+
+            group.add(new THREE.Mesh(geometry, material));
+        } else {
+            // Fallback: render skeleton as line segments
+            const { nodes, edges } = neuronData;
+            const positions = new Float32Array(edges.length * 6);
+            for (let i = 0; i < edges.length; i++) {
+                const [pIdx, cIdx] = edges[i];
+                const p = nodes[pIdx];
+                const c = nodes[cIdx];
+                positions[i * 6 + 0] = p[0] - centroid[0];
+                positions[i * 6 + 1] = p[1] - centroid[1];
+                positions[i * 6 + 2] = p[2] - centroid[2];
+                positions[i * 6 + 3] = c[0] - centroid[0];
+                positions[i * 6 + 4] = c[1] - centroid[1];
+                positions[i * 6 + 5] = c[2] - centroid[2];
+            }
+
+            const geometry = new THREE.BufferGeometry();
+            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            group.add(new THREE.LineSegments(geometry, new THREE.LineBasicMaterial({ color })));
         }
 
-        const geometry = new THREE.BufferGeometry();
-        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-
-        const material = new THREE.LineBasicMaterial({
-            color,
-            linewidth: 1,
-        });
-
-        const lines = new THREE.LineSegments(geometry, material);
-        group.add(lines);
-
-        // Soma marker (white sphere, always 1 µm diameter as scale reference)
-        // 1 µm = 1000 nm; data is in 8nm voxel units → 1 µm = 125 voxel units
+        // Soma marker (white sphere)
         if (neuronData.soma) {
-            const somaRadius = 125 / 2; // 0.5 µm radius = 62.5 voxel units
+            const somaRadius = 125 / 2;
             const somaGeo = new THREE.SphereGeometry(somaRadius, 16, 16);
             const somaMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
             const somaMesh = new THREE.Mesh(somaGeo, somaMat);
@@ -115,8 +140,6 @@ export class NeuronViewer {
 
         this.scene.add(group);
         this.currentGroup = group;
-
-        // Fit camera
         this._fitCamera(neuronData);
     }
 

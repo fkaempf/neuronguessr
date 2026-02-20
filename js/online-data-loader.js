@@ -9,6 +9,7 @@
 
 import { queryRandomNeurons, fetchSkeleton, setToken } from './neuprint-client.js';
 import { parseSkeletonToNeuron } from './swc-parser.js';
+import { DVID_BASE, DVID_NODE } from './config.js';
 
 // Dataset constants (same as in the static manifest)
 const BRAIN_BOUNDS = {
@@ -49,12 +50,17 @@ export async function loadOnlineManifest(token, poolSize = 30) {
 
 /**
  * Fetch and parse a single neuron by body ID from neuPrint.
+ * Also attempts to fetch the 3D mesh from DVID (falls back to skeleton-only).
  *
  * @param {Object} neuronEntry - Entry from manifest.neurons (has bodyId and _metadata)
  * @returns {Promise<Object>} - Neuron data matching the app's interface
  */
 export async function loadOnlineNeuron(neuronEntry) {
-    const skeletonResp = await fetchSkeleton(neuronEntry.bodyId);
+    // Fetch skeleton and mesh in parallel
+    const [skeletonResp, meshData] = await Promise.all([
+        fetchSkeleton(neuronEntry.bodyId),
+        fetchNeuronMesh(neuronEntry.bodyId),
+    ]);
 
     // neuPrint may return { data: [[...], ...] } or a flat array
     let rows;
@@ -66,5 +72,62 @@ export async function loadOnlineNeuron(neuronEntry) {
         throw new Error(`Unexpected skeleton format for bodyId ${neuronEntry.bodyId}`);
     }
 
-    return parseSkeletonToNeuron(rows, neuronEntry._metadata);
+    const neuronData = parseSkeletonToNeuron(rows, neuronEntry._metadata);
+
+    // Attach mesh if available (vertices already in 8nm voxel units)
+    if (meshData) {
+        neuronData.mesh = meshData;
+    }
+
+    return neuronData;
+}
+
+/**
+ * Fetch a neuron mesh from DVID in neuroglancer .ngmesh format.
+ * Returns null if mesh is not available.
+ *
+ * @param {number} bodyId
+ * @returns {Promise<{vertices: Float32Array, indices: Uint32Array}|null>}
+ */
+async function fetchNeuronMesh(bodyId) {
+    try {
+        const url = `${DVID_BASE}/api/node/${DVID_NODE}/segmentation_meshes/key/${bodyId}.ngmesh`;
+        const resp = await fetch(url);
+        if (!resp.ok) return null;
+        const buffer = await resp.arrayBuffer();
+        return parseNgMesh(buffer);
+    } catch {
+        return null;
+    }
+}
+
+/**
+ * Parse neuroglancer .ngmesh binary format.
+ * Format: int32 vertexCount, then vertexCount*3 float32 vertices (nanometers),
+ * then remaining int32s are triangle face indices.
+ * Converts vertices from nanometers to 8nm voxel units.
+ */
+function parseNgMesh(buffer) {
+    if (buffer.byteLength < 4) return null;
+
+    const view = new DataView(buffer);
+    const nVerts = view.getUint32(0, true);
+
+    const vertexByteOffset = 4;
+    const vertexByteLength = nVerts * 3 * 4;
+    if (buffer.byteLength < vertexByteOffset + vertexByteLength) return null;
+
+    // Read vertices (nanometers) and convert to 8nm voxel units
+    const rawVerts = new Float32Array(buffer, vertexByteOffset, nVerts * 3);
+    const vertices = new Float32Array(nVerts * 3);
+    for (let i = 0; i < rawVerts.length; i++) {
+        vertices[i] = rawVerts[i] / 8;
+    }
+
+    const indexByteOffset = vertexByteOffset + vertexByteLength;
+    const nIndices = (buffer.byteLength - indexByteOffset) / 4;
+    if (nIndices < 3) return null;
+    const indices = new Uint32Array(buffer, indexByteOffset, nIndices);
+
+    return { vertices, indices };
 }

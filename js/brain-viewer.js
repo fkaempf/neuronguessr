@@ -403,6 +403,43 @@ export class BrainViewer {
     }
 
     _showNeuronInContext(neuronData, mirrorMidlineX) {
+        if (neuronData.mesh) {
+            this._showMeshInContext(neuronData.mesh, mirrorMidlineX);
+        } else {
+            this._showSkeletonInContext(neuronData, mirrorMidlineX);
+        }
+    }
+
+    _showMeshInContext(mesh, mirrorMidlineX) {
+        const { vertices, indices } = mesh;
+        const verts = new Float32Array(vertices.length);
+
+        for (let i = 0; i < vertices.length; i += 3) {
+            let x = vertices[i];
+            if (mirrorMidlineX != null) x = 2 * mirrorMidlineX - x;
+            verts[i] = x;
+            verts[i + 1] = vertices[i + 1] * Y_FLIP;
+            verts[i + 2] = vertices[i + 2];
+        }
+
+        const geo = new THREE.BufferGeometry();
+        geo.setAttribute('position', new THREE.BufferAttribute(verts, 3));
+        geo.setIndex(new THREE.BufferAttribute(indices, 1));
+        geo.computeVertexNormals();
+
+        const mat = new THREE.MeshPhongMaterial({
+            color: 0xffaa00,
+            shininess: 30,
+            side: THREE.DoubleSide,
+            transparent: true,
+            opacity: 0.85,
+        });
+
+        this.neuronGroup = new THREE.Mesh(geo, mat);
+        this.scene.add(this.neuronGroup);
+    }
+
+    _showSkeletonInContext(neuronData, mirrorMidlineX) {
         const { nodes, edges } = neuronData;
         const positions = new Float32Array(edges.length * 6);
 
@@ -592,10 +629,10 @@ export class BrainViewer {
         this._brainSize = box.getSize(new THREE.Vector3());
         const maxDim = Math.max(this._brainSize.x, this._brainSize.y, this._brainSize.z);
 
-        // Position camera looking from front (anterior view)
+        // Position camera looking from back (posterior view)
         this.camera.position.set(
             this._brainCenter.x, this._brainCenter.y,
-            this._brainCenter.z + maxDim * 1.2
+            this._brainCenter.z - maxDim * 1.2
         );
 
         if (this.camera.isPerspectiveCamera) {
