@@ -65,21 +65,33 @@ export async function fetchSkeleton(bodyId) {
  */
 export async function queryRandomNeurons(count = 5) {
     const limit = count * 2;
+    // Two-stage sampling: pick random types first, then one random neuron per type.
+    // This prevents optic lobe neurons (most numerous) from dominating.
     const cypher = `
         MATCH (n:Neuron)
         WHERE n.status = "Traced"
           AND n.pre >= 20
           AND n.post >= 20
-        WITH n, rand() AS r
+          AND n.type IS NOT NULL
+        WITH DISTINCT n.type AS t
+        WITH t, rand() AS r
         ORDER BY r
         LIMIT ${limit}
-        RETURN n.bodyId AS bodyId,
-               n.type AS type,
-               n.instance AS instance,
-               n.pre AS pre,
-               n.post AS post,
-               n.somaLocation AS somaLocation,
-               n.roiInfo AS roiInfo
+        MATCH (m:Neuron)
+        WHERE m.type = t
+          AND m.status = "Traced"
+          AND m.pre >= 20
+          AND m.post >= 20
+        WITH t, m, rand() AS r2
+        ORDER BY t, r2
+        WITH t, head(collect(m)) AS m
+        RETURN m.bodyId AS bodyId,
+               m.type AS type,
+               m.instance AS instance,
+               m.pre AS pre,
+               m.post AS post,
+               m.somaLocation AS somaLocation,
+               m.roiInfo AS roiInfo
     `;
 
     const result = await cypherQuery(cypher);
