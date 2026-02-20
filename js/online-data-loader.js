@@ -98,17 +98,19 @@ export async function loadOnlineNeuron(neuronEntry) {
         fetchNeuronMesh(neuronEntry.bodyId),
     ]);
 
-    // neuPrint may return { data: [[...], ...] } or a flat array
+    // neuPrint may return { columns, data: [[...], ...] } or a flat array
     let rows;
+    let columns = null;
     if (skeletonResp && skeletonResp.data && Array.isArray(skeletonResp.data)) {
         rows = skeletonResp.data;
+        columns = skeletonResp.columns || null;
     } else if (Array.isArray(skeletonResp)) {
         rows = skeletonResp;
     } else {
         throw new Error(`Unexpected skeleton format for bodyId ${neuronEntry.bodyId}`);
     }
 
-    const neuronData = parseSkeletonToNeuron(rows, neuronEntry._metadata);
+    const neuronData = parseSkeletonToNeuron(rows, neuronEntry._metadata, columns);
 
     // Attach mesh if available (vertices already in 8nm voxel units)
     if (meshData) {

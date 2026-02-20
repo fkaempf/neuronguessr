@@ -19,9 +19,10 @@ const KEEP_EVERY_NTH = 5;
  *
  * @param {Array<Array>} rows - SWC rows: [[rowId, x, y, z, radius, link], ...]
  * @param {Object} metadata - { bodyId, type, instance, pre, post, somaLocation, region }
+ * @param {string[]|null} columns - Column names from the skeleton response
  * @returns {Object} Neuron data matching the app's interface
  */
-export function parseSkeletonToNeuron(rows, metadata) {
+export function parseSkeletonToNeuron(rows, metadata, columns = null) {
     if (!rows || rows.length === 0) {
         throw new Error(`Empty skeleton data for bodyId ${metadata.bodyId}`);
     }
@@ -56,8 +57,8 @@ export function parseSkeletonToNeuron(rows, metadata) {
         Math.round((sumZ / n) * 10) / 10,
     ];
 
-    // Extract soma from skeleton: root node (link = -1) is typically the soma
-    const soma = _findSomaFromSkeleton(rows);
+    // Find soma: try somaLocation metadata (converted to skeleton coords), then skeleton heuristics
+    const soma = _findSoma(rows, columns, metadata.somaLocation, { minX, minY, minZ, maxX, maxY, maxZ });
 
     // Answer position: soma if available, else centroid
     const answer = soma ? [...soma] : [...centroid];
@@ -171,26 +172,111 @@ function _downsampleSkeleton(rows) {
 }
 
 /**
- * Find soma position from skeleton data.
- * The root node (link = -1) is the soma in neuPrint skeletons.
- * Falls back to the node with the largest radius.
+ * Find soma position using multiple strategies in priority order:
+ * 1. somaLocation metadata from neuPrint, snapped to nearest skeleton node
+ * 2. SWC type column (type=1 is soma in standard SWC format)
+ * 3. Node with largest radius (soma is typically the thickest part)
+ * 4. Root node (link = -1)
  */
-function _findSomaFromSkeleton(rows) {
+function _findSoma(rows, columns, somaLocation, bounds) {
     if (!rows || rows.length === 0) return null;
 
-    // Find root node (link = -1)
-    for (const [rowId, x, y, z, radius, link] of rows) {
-        if (link === -1) return [x, y, z];
+    // Build column index map
+    const colIdx = {};
+    if (columns) {
+        columns.forEach((c, i) => colIdx[c.toLowerCase()] = i);
     }
+    // Default column positions if no column info
+    const iX = colIdx['x'] ?? 1;
+    const iY = colIdx['y'] ?? 2;
+    const iZ = colIdx['z'] ?? 3;
+    const iRadius = colIdx['radius'] ?? 4;
+    const iLink = colIdx['link'] ?? 5;
+    const iType = colIdx['type'] ?? -1; // may not exist
 
-    // Fallback: node with largest radius
-    let best = null;
-    let bestRadius = -1;
-    for (const [rowId, x, y, z, radius] of rows) {
-        if (radius > bestRadius) {
-            bestRadius = radius;
-            best = [x, y, z];
+    // Strategy 1: somaLocation metadata — snap to nearest skeleton node
+    const somaCoord = _parseSomaLocation(somaLocation);
+    if (somaCoord) {
+        // Try the raw coords and also divided by 8 (nm → voxel)
+        for (const scale of [1, 1 / 8]) {
+            const sx = somaCoord[0] * scale;
+            const sy = somaCoord[1] * scale;
+            const sz = somaCoord[2] * scale;
+
+            // Check if this is within reasonable range of skeleton bounds
+            const margin = Math.max(
+                bounds.maxX - bounds.minX,
+                bounds.maxY - bounds.minY,
+                bounds.maxZ - bounds.minZ
+            );
+            if (sx < bounds.minX - margin || sx > bounds.maxX + margin ||
+                sy < bounds.minY - margin || sy > bounds.maxY + margin ||
+                sz < bounds.minZ - margin || sz > bounds.maxZ + margin) {
+                continue;
+            }
+
+            // Snap to nearest skeleton node
+            let bestDist = Infinity;
+            let bestNode = null;
+            for (const row of rows) {
+                const dx = row[iX] - sx;
+                const dy = row[iY] - sy;
+                const dz = row[iZ] - sz;
+                const d = dx * dx + dy * dy + dz * dz;
+                if (d < bestDist) {
+                    bestDist = d;
+                    bestNode = [row[iX], row[iY], row[iZ]];
+                }
+            }
+            if (bestNode) return bestNode;
         }
     }
-    return best;
+
+    // Strategy 2: SWC type column (type=1 is soma)
+    if (iType >= 0) {
+        for (const row of rows) {
+            if (row[iType] === 1) return [row[iX], row[iY], row[iZ]];
+        }
+    }
+
+    // Strategy 3: node with largest radius (soma tends to be thickest)
+    let bestRadiusNode = null;
+    let bestRadius = 0;
+    for (const row of rows) {
+        const r = row[iRadius];
+        if (r > bestRadius) {
+            bestRadius = r;
+            bestRadiusNode = [row[iX], row[iY], row[iZ]];
+        }
+    }
+    if (bestRadiusNode && bestRadius > 0) return bestRadiusNode;
+
+    // Strategy 4: root node (link = -1)
+    for (const row of rows) {
+        if (row[iLink] === -1) return [row[iX], row[iY], row[iZ]];
+    }
+
+    return null;
+}
+
+/**
+ * Parse somaLocation from various neuPrint formats.
+ */
+function _parseSomaLocation(somaLocation) {
+    if (!somaLocation) return null;
+
+    if (typeof somaLocation === 'string') {
+        try { somaLocation = JSON.parse(somaLocation); }
+        catch { return null; }
+    }
+
+    if (Array.isArray(somaLocation) && somaLocation.length >= 3) {
+        return [somaLocation[0], somaLocation[1], somaLocation[2]];
+    }
+
+    if (typeof somaLocation === 'object' && somaLocation.x !== undefined) {
+        return [somaLocation.x, somaLocation.y, somaLocation.z];
+    }
+
+    return null;
 }
