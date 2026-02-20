@@ -636,10 +636,13 @@ export class BrainViewer {
         this._brainSize = box.getSize(new THREE.Vector3());
         const maxDim = Math.max(this._brainSize.x, this._brainSize.y, this._brainSize.z);
 
-        // Position camera looking at the front of the brain (anterior view)
+        // Standard anatomical view: 145° turntable rotation from +Z around Y
+        const dist = maxDim * 1.2;
+        const angle = 145 * Math.PI / 180;
         this.camera.position.set(
-            this._brainCenter.x, this._brainCenter.y,
-            this._brainCenter.z + maxDim * 1.2
+            this._brainCenter.x + dist * Math.sin(angle),
+            this._brainCenter.y,
+            this._brainCenter.z + dist * Math.cos(angle)
         );
         this.camera.up.set(0, 1, 0);
 
