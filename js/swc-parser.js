@@ -57,7 +57,18 @@ export function parseSkeletonToNeuron(rows, metadata) {
     ];
 
     // Extract soma location from metadata
-    const soma = _parseSoma(metadata.somaLocation);
+    // neuPrint returns somaLocation in nanometers; skeleton nodes are in 8nm voxel units
+    const somaNm = _parseSoma(metadata.somaLocation);
+    let soma = null;
+    if (somaNm) {
+        const somaVoxel = [somaNm[0] / 8, somaNm[1] / 8, somaNm[2] / 8];
+        // Sanity check: if dividing by 8 puts it near the skeleton, use that
+        const margin = Math.max(maxX - minX, maxY - minY, maxZ - minZ) * 2;
+        const near = somaVoxel[0] > minX - margin && somaVoxel[0] < maxX + margin &&
+                     somaVoxel[1] > minY - margin && somaVoxel[1] < maxY + margin &&
+                     somaVoxel[2] > minZ - margin && somaVoxel[2] < maxZ + margin;
+        soma = near ? somaVoxel : somaNm;
+    }
 
     // Answer position: soma if available, else centroid
     const answer = soma ? [...soma] : [...centroid];
