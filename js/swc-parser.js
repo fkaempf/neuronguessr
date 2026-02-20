@@ -56,19 +56,8 @@ export function parseSkeletonToNeuron(rows, metadata) {
         Math.round((sumZ / n) * 10) / 10,
     ];
 
-    // Extract soma location from metadata
-    // neuPrint returns somaLocation in nanometers; skeleton nodes are in 8nm voxel units
-    const somaNm = _parseSoma(metadata.somaLocation);
-    let soma = null;
-    if (somaNm) {
-        const somaVoxel = [somaNm[0] / 8, somaNm[1] / 8, somaNm[2] / 8];
-        // Sanity check: if dividing by 8 puts it near the skeleton, use that
-        const margin = Math.max(maxX - minX, maxY - minY, maxZ - minZ) * 2;
-        const near = somaVoxel[0] > minX - margin && somaVoxel[0] < maxX + margin &&
-                     somaVoxel[1] > minY - margin && somaVoxel[1] < maxY + margin &&
-                     somaVoxel[2] > minZ - margin && somaVoxel[2] < maxZ + margin;
-        soma = near ? somaVoxel : somaNm;
-    }
+    // Extract soma from skeleton: root node (link = -1) is typically the soma
+    const soma = _findSomaFromSkeleton(rows);
 
     // Answer position: soma if available, else centroid
     const answer = soma ? [...soma] : [...centroid];
@@ -182,24 +171,26 @@ function _downsampleSkeleton(rows) {
 }
 
 /**
- * Parse soma location from various formats neuPrint may return.
+ * Find soma position from skeleton data.
+ * The root node (link = -1) is the soma in neuPrint skeletons.
+ * Falls back to the node with the largest radius.
  */
-function _parseSoma(somaLocation) {
-    if (!somaLocation) return null;
+function _findSomaFromSkeleton(rows) {
+    if (!rows || rows.length === 0) return null;
 
-    // neuPrint may return somaLocation as a JSON string
-    if (typeof somaLocation === 'string') {
-        try { somaLocation = JSON.parse(somaLocation); }
-        catch { return null; }
+    // Find root node (link = -1)
+    for (const [rowId, x, y, z, radius, link] of rows) {
+        if (link === -1) return [x, y, z];
     }
 
-    if (Array.isArray(somaLocation) && somaLocation.length >= 3) {
-        return [somaLocation[0], somaLocation[1], somaLocation[2]];
+    // Fallback: node with largest radius
+    let best = null;
+    let bestRadius = -1;
+    for (const [rowId, x, y, z, radius] of rows) {
+        if (radius > bestRadius) {
+            bestRadius = radius;
+            best = [x, y, z];
+        }
     }
-
-    if (typeof somaLocation === 'object' && somaLocation.x !== undefined) {
-        return [somaLocation.x, somaLocation.y, somaLocation.z];
-    }
-
-    return null;
+    return best;
 }
