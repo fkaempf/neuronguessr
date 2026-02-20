@@ -521,7 +521,7 @@ $btnReplay.addEventListener('click', () => {
     updateAuthUI();
 });
 $btnShare.addEventListener('click', async () => {
-    const stored = JSON.parse(localStorage.getItem(`daily_result_${manifest.date}`) || 'null');
+    const stored = JSON.parse(localStorage.getItem(`daily_result_${manifest?.date}`) || 'null');
     if (!stored) return;
     const text = generateShareText(stored.date, stored.totalScore, stored.roundScores);
     try {
@@ -542,7 +542,7 @@ $btnShareStart.addEventListener('click', async () => {
         $btnShareStart.textContent = 'Copied!';
         setTimeout(() => { $btnShareStart.textContent = 'Share'; }, 2000);
     } catch {
-        // ignore
+        // User cancelled share sheet or clipboard denied — silently ignore
     }
 });
 $btnSubmitScore.addEventListener('click', handleScoreSubmit);
