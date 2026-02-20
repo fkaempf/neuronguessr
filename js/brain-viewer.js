@@ -635,10 +635,9 @@ export class BrainViewer {
         // Position camera looking at the front of the brain (standard view)
         this.camera.position.set(
             this._brainCenter.x, this._brainCenter.y,
-            this._brainCenter.z + maxDim * 1.2
+            this._brainCenter.z - maxDim * 1.2
         );
-        // Flip horizontally so left/right match anatomical convention
-        this.camera.up.set(0, -1, 0);
+        this.camera.up.set(0, 1, 0);
 
         if (this.camera.isPerspectiveCamera) {
             this.camera.near = 10;
