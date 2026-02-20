@@ -91,7 +91,7 @@ export function renderHistogram(canvas, scores, myScore) {
     }
 
     const maxBin = Math.max(...bins, 1);
-    const pad = { top: 10, right: 10, bottom: 28, left: 10 };
+    const pad = { top: 22, right: 10, bottom: 28, left: 10 };
     const plotW = w - pad.left - pad.right;
     const plotH = h - pad.top - pad.bottom;
     const barW = plotW / binCount;
