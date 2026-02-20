@@ -805,7 +805,6 @@ body {
     background: rgba(0, 0, 0, 0.4);
     border-left: 2px solid #1a1a2e;
     padding: 24px;
-    overflow-y: auto;
 }
 
 .final-card {
@@ -858,11 +857,33 @@ body {
     font-weight: 500;
 }
 
+.leaderboard-scroll {
+    max-height: 200px;
+    overflow-y: auto;
+    border-radius: 6px;
+    margin-bottom: 12px;
+    scrollbar-width: thin;
+    scrollbar-color: #333 transparent;
+}
+
+.leaderboard-scroll::-webkit-scrollbar {
+    width: 6px;
+}
+.leaderboard-scroll::-webkit-scrollbar-track {
+    background: transparent;
+}
+.leaderboard-scroll::-webkit-scrollbar-thumb {
+    background: #333;
+    border-radius: 3px;
+}
+.leaderboard-scroll::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
 .leaderboard-table {
     width: 100%;
     border-collapse: collapse;
     font-size: 13px;
-    margin-bottom: 16px;
 }
 
 .leaderboard-table th {
@@ -938,6 +959,20 @@ body {
         width: 100%;
         border-left: none;
         border-top: 2px solid #1a1a2e;
+        align-items: flex-start;
+        padding: 16px;
+    }
+
+    /* Let the whole layout scroll on mobile instead of the side panel */
+    #result-layout,
+    #final-layout {
+        overflow-y: auto;
+    }
+
+    #result-brain-panel,
+    #final-brain-panel {
+        flex: 0 0 35vh;
+        min-height: 140px;
     }
 
     .title {
@@ -957,7 +992,33 @@ body {
     }
 
     .result-card {
-        padding: 24px;
+        padding: 16px;
+    }
+
+    .result-card h2 {
+        font-size: 16px;
+        margin-bottom: 8px;
+    }
+
+    .result-details {
+        margin: 12px 0;
+    }
+
+    .result-hint {
+        margin: 10px 0;
+    }
+
+    .final-card h1 {
+        font-size: 28px;
+    }
+
+    .final-subtitle {
+        font-size: 15px;
+        margin-bottom: 16px;
+    }
+
+    #round-breakdown {
+        margin-bottom: 16px;
     }
 
     /* Show toggle bar on mobile */
@@ -997,10 +1058,15 @@ body {
     .panel-label {
         font-size: 11px;
         padding: 6px 10px;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: center;
+        gap: 4px 8px;
     }
 
     .panel-label .btn-small {
-        margin-left: 6px;
+        margin-left: 0;
         font-size: 10px;
         padding: 2px 6px;
     }
@@ -1031,7 +1097,11 @@ body {
 
     /* Depth slider: shown via JS when guess is placed */
     .depth-slider-row {
-        padding: 6px 12px;
+        padding: 4px 12px;
+    }
+
+    .depth-label {
+        font-size: 11px;
     }
 
     /* Bigger tap target for token button */

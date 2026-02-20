@@ -27,7 +27,8 @@ export async function fetchScores(mode, date) {
 }
 
 /**
- * Render leaderboard table into a container.
+ * Render leaderboard table into a scrollable container,
+ * centered on the user's rank position.
  */
 export function renderLeaderboard(container, scores, myScore) {
     if (!scores || scores.length === 0) {
@@ -35,18 +36,38 @@ export function renderLeaderboard(container, scores, myScore) {
         return;
     }
 
-    const top = scores.slice(0, 20);
-    let html = '<table class="leaderboard-table"><thead><tr><th>#</th><th>Player</th><th>Score</th></tr></thead><tbody>';
-
-    for (let i = 0; i < top.length; i++) {
-        const s = top[i];
-        const isMe = myScore !== undefined && s.score === myScore && s.timestamp === scores.find(x => x.score === myScore)?.timestamp;
-        const cls = isMe ? ' class="leaderboard-me"' : '';
-        html += `<tr${cls}><td>${i + 1}</td><td>${escapeHtml(s.name)}</td><td>${s.score.toLocaleString()}</td></tr>`;
+    // Find user's rank (first entry matching myScore)
+    let myIdx = -1;
+    if (myScore !== undefined) {
+        myIdx = scores.findIndex(s => s.score === myScore);
     }
 
-    html += '</tbody></table>';
+    // Build full table
+    let html = '<div class="leaderboard-scroll"><table class="leaderboard-table"><thead><tr><th>#</th><th>Player</th><th>Score</th></tr></thead><tbody>';
+
+    for (let i = 0; i < scores.length; i++) {
+        const s = scores[i];
+        const isMe = i === myIdx;
+        const cls = isMe ? ' class="leaderboard-me"' : '';
+        const id = isMe ? ' id="leaderboard-me-row"' : '';
+        html += `<tr${cls}${id}><td>${i + 1}</td><td>${escapeHtml(s.name)}</td><td>${s.score.toLocaleString()}</td></tr>`;
+    }
+
+    html += '</tbody></table></div>';
     container.innerHTML = html;
+
+    // Scroll leaderboard to center on user's row (use index-based calc for reliability)
+    if (myIdx >= 0) {
+        const scrollDiv = container.querySelector('.leaderboard-scroll');
+        if (scrollDiv) {
+            // Wait for layout, then scroll based on row position in table
+            setTimeout(() => {
+                const rowHeight = scrollDiv.scrollHeight / scores.length;
+                const targetTop = myIdx * rowHeight - scrollDiv.clientHeight / 2 + rowHeight / 2;
+                scrollDiv.scrollTop = Math.max(0, targetTop);
+            }, 50);
+        }
+    }
 }
 
 /**

@@ -1,6 +1,6 @@
 # NeuronGuessr
 
-A [GeoGuessr](https://www.geoguessr.com/)-inspired web game where you identify neurons in the *Drosophila* (fruit fly) brain. Study a 3D neuron mesh, guess where in the brain it belongs and how many synapses it has.
+A web game inspired by [GeoGuessr](https://www.geoguessr.com/) and [TimeGuessr](https://timeguessr.com/) where you identify neurons in the *Drosophila* (fruit fly) brain. Study a 3D neuron mesh, guess where in the brain it belongs and how many synapses it has.
 
 **[Play now](https://fkaempf.github.io/neuronguessr/)** (requires a free neuPrint API token)
 
