@@ -350,6 +350,11 @@ document.onkeydown = function(e) {
     }
 };
 
+document.getElementById('btn-info-toggle').addEventListener('click', () => {
+    const el = document.getElementById('tech-stack');
+    el.style.display = el.style.display === 'none' ? 'block' : 'none';
+});
+
 $btnScoring.addEventListener('click', () => {
     showScreen('screen-scoring');
     drawScoringCharts();

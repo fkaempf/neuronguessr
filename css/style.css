@@ -116,6 +116,40 @@ body {
     color: #666;
 }
 
+.info-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 1px solid #555;
+    background: none;
+    color: #555;
+    font-size: 10px;
+    font-style: italic;
+    font-family: Georgia, serif;
+    cursor: pointer;
+    margin-left: 6px;
+    vertical-align: middle;
+    transition: color 0.2s, border-color 0.2s;
+    padding: 0;
+    line-height: 1;
+}
+.info-toggle:hover {
+    color: #aaa;
+    border-color: #aaa;
+}
+
+.tech-stack {
+    font-size: 11px;
+    color: #444;
+    margin-top: 4px;
+}
+.tech-stack a {
+    color: #555;
+}
+
 /* === Auth Section === */
 .auth-section {
     margin-bottom: 16px;
