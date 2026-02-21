@@ -154,7 +154,8 @@ const $btnShowNeuron = document.getElementById('btn-show-neuron');
 const $btnShowBrain = document.getElementById('btn-show-brain');
 const $panelNeuron = document.getElementById('panel-neuron');
 const $panelBrain = document.getElementById('panel-brain');
-const $depthSliderRow = document.getElementById('depth-slider-row');
+const $depthSliderInline = document.getElementById('depth-slider-inline');
+const $hintTapGuess = document.getElementById('hint-tap-guess');
 const $depthSlider = document.getElementById('depth-slider');
 const $playerName = document.getElementById('player-name');
 const $btnSubmitScore = document.getElementById('btn-submit-score');
@@ -390,7 +391,8 @@ async function loadRound() {
     brainViewer.resetCamera();
 
     // Reset depth slider
-    $depthSliderRow.style.display = 'none';
+    $depthSliderInline.style.display = 'none';
+    $hintTapGuess.style.display = '';
     $depthSlider.value = 0;
 
     // Update HUD
@@ -411,13 +413,10 @@ function onGuessPlaced(position) {
     updateSubmitButton();
     $guessCoords.textContent = `(${position[0].toFixed(0)}, ${position[1].toFixed(0)}, ${position[2].toFixed(0)})`;
 
-    // Show depth slider on mobile when guess is placed
+    // Show depth slider inline (replaces hint text) on mobile when guess is placed
     if (window.innerWidth <= 768) {
-        $depthSliderRow.style.display = 'flex';
-        // Reading offsetHeight forces a synchronous reflow so the canvas
-        // container has its new (shorter) height before we resize the renderer.
-        void $depthSliderRow.offsetHeight;
-        brainViewer._onResize();
+        $hintTapGuess.style.display = 'none';
+        $depthSliderInline.style.display = 'flex';
     }
 }
 

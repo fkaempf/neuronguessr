@@ -423,20 +423,17 @@ body {
 /* Desktop/mobile label text (toggled via media query) */
 .panel-label-mobile { display: none; }
 
-/* === Depth Slider === */
-.depth-slider-row {
-    padding: 6px 16px;
-    background: rgba(0, 0, 0, 0.6);
-    border-bottom: 1px solid #222;
+/* === Depth Slider (inline in panel-label on mobile) === */
+.depth-slider-inline {
     display: flex;
     align-items: center;
-    gap: 10px;
-    flex-shrink: 0;
+    gap: 6px;
+    flex: 1 0 100%; /* own line inside the flex-wrap label */
 }
 
 .depth-label {
     color: #aaa;
-    font-size: 12px;
+    font-size: 11px;
     white-space: nowrap;
 }
 
@@ -1127,11 +1124,6 @@ body {
     /* Swap label text on mobile */
     .panel-label-desktop { display: none; }
     .panel-label-mobile { display: inline; }
-
-    /* Depth slider: shown via JS when guess is placed */
-    .depth-slider-row {
-        padding: 4px 12px;
-    }
 
     .depth-label {
         font-size: 11px;

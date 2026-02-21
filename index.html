@@ -131,19 +131,18 @@
                 <div id="brain-canvas-container" class="canvas-container"></div>
                 <div class="panel-label">
                     <span class="panel-label-desktop">Click to place guess, Shift+scroll to adjust depth</span>
-                    <span class="panel-label-mobile">Tap to place guess</span>
+                    <span class="panel-label-mobile" id="hint-tap-guess">Tap to place guess</span>
+                    <!-- Depth slider: replaces hint on mobile after guess placed -->
+                    <span id="depth-slider-inline" class="depth-slider-inline" style="display:none;">
+                        <span class="depth-label">Depth</span>
+                        <input type="range" id="depth-slider" min="-500" max="500" value="0" step="1">
+                    </span>
                     <span id="guess-coords" class="coords-display"></span>
                     <button id="btn-toggle-roi" class="btn-small">Show Brain Regions</button>
                     <button id="btn-toggle-ortho" class="btn-small">Perspective View</button>
                     <button id="btn-reset-view" class="btn-small">Reset View</button>
                 </div>
             </div>
-        </div>
-
-        <!-- Depth slider (mobile only, shown after guess placed) -->
-        <div id="depth-slider-row" class="depth-slider-row" style="display:none;">
-            <label class="depth-label">Depth:</label>
-            <input type="range" id="depth-slider" min="-500" max="500" value="0" step="1">
         </div>
 
         <!-- Bottom action bar -->
