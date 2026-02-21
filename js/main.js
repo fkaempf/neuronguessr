@@ -21,6 +21,21 @@ let manifest;
 let currentNeuronData;
 let gameMode = 'daily'; // 'daily' or 'freeplay'
 
+// Preload: kick off loading the next round's neuron in the background
+// while the player is reviewing the current round result.
+let _preloadData = null;   // resolved neuron data
+let _preloadRound = -1;    // selectedNeurons index that was preloaded
+
+function _preloadNextNeuron() {
+    const next = gameState.currentRound + 1;
+    if (next >= ROUNDS_PER_GAME || _preloadRound === next) return;
+    _preloadRound = next;
+    _preloadData = null;
+    loadOnlineNeuron(gameState.selectedNeurons[next])
+        .then(data => { if (_preloadRound === next) _preloadData = data; })
+        .catch(() => { _preloadRound = -1; _preloadData = null; });
+}
+
 // Synapse slider: logarithmic mapping from slider (0-1000) to synapse count (10-200000)
 const SYNAPSE_MIN = 10;
 const SYNAPSE_MAX = 200000;
@@ -68,14 +83,32 @@ function generateShareText(date, totalScore, roundScores) {
 }
 
 /**
- * Copy text to clipboard, using Web Share API on mobile if available.
- * Returns a promise that resolves when done.
+ * Copy text to clipboard.
+ * Tries Clipboard API first, then execCommand fallback.
+ * Falls back to native share sheet only if both clipboard methods fail.
  */
 async function shareText(text) {
+    // Clipboard API (works on HTTPS + user gesture)
+    if (navigator.clipboard?.writeText) {
+        try {
+            await navigator.clipboard.writeText(text);
+            return;
+        } catch { /* fall through */ }
+    }
+    // execCommand fallback (deprecated but universal)
+    try {
+        const el = document.createElement('textarea');
+        el.value = text;
+        el.style.cssText = 'position:fixed;top:-9999px;left:-9999px;opacity:0';
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand('copy');
+        document.body.removeChild(el);
+        return;
+    } catch { /* fall through */ }
+    // Last resort: native share sheet
     if (navigator.share) {
         await navigator.share({ text });
-    } else {
-        await navigator.clipboard.writeText(text);
     }
 }
 
@@ -313,28 +346,37 @@ async function startGame(mode = 'daily') {
 
     gameState.startNewGame(manifest.neurons);
     brainViewer.clearOverview();
+    _preloadData = null;
+    _preloadRound = -1;
     await loadRound();
 }
 
 async function loadRound() {
     const neuronMeta = gameState.getCurrentNeuronMeta();
 
-    showScreen('screen-loading');
-    $loadingText.textContent = `Fetching neuron ${neuronMeta.bodyId}...`;
-    try {
-        currentNeuronData = await loadOnlineNeuron(neuronMeta);
-    } catch (err) {
-        console.error(`Failed to load neuron ${neuronMeta.bodyId}:`, err);
-        const isAuth = err.message && (err.message.includes('401') || err.message.includes('jwt') || err.message.includes('credentials'));
-        if (isAuth) {
-            $loadingText.textContent = 'Token expired or invalid. Please sign in again.';
-            signOut();
-            await new Promise(r => setTimeout(r, 2500));
-            showScreen('screen-start');
-            return;
+    if (_preloadRound === gameState.currentRound && _preloadData) {
+        // Preloaded data is ready — use it directly, skip loading screen
+        currentNeuronData = _preloadData;
+        _preloadData = null;
+        _preloadRound = -1;
+    } else {
+        showScreen('screen-loading');
+        $loadingText.textContent = `Fetching neuron ${neuronMeta.bodyId}...`;
+        try {
+            currentNeuronData = await loadOnlineNeuron(neuronMeta);
+        } catch (err) {
+            console.error(`Failed to load neuron ${neuronMeta.bodyId}:`, err);
+            const isAuth = err.message && (err.message.includes('401') || err.message.includes('jwt') || err.message.includes('credentials'));
+            if (isAuth) {
+                $loadingText.textContent = 'Token expired or invalid. Please sign in again.';
+                signOut();
+                await new Promise(r => setTimeout(r, 2500));
+                showScreen('screen-start');
+                return;
+            }
+            $loadingText.textContent = 'Failed to load neuron. Retrying...';
+            throw err;
         }
-        $loadingText.textContent = 'Failed to load neuron. Retrying...';
-        throw err;
     }
 
     // Show game screen BEFORE moving canvas so container has real dimensions
@@ -407,6 +449,9 @@ function submitGuess() {
     $totalScoreResult.textContent = `Score: ${gameState.totalScore.toLocaleString()}`;
 
     $btnNext.textContent = gameState.isGameOver() ? 'See Final Score' : 'Next Round';
+
+    // Start preloading the next round in the background while the result is shown
+    _preloadNextNeuron();
 
     // Show result screen BEFORE moving canvas so container has real dimensions
     showScreen('screen-result');
@@ -484,11 +529,17 @@ function showFinalScore() {
 async function loadLeaderboard() {
     const date = manifest?.date || new Date().toISOString().split('T')[0];
     try {
-        const data = await fetchScores(gameMode, date);
+        // Always fetch daily all-time scores for the histogram so both modes
+        // show the same distribution as reference. Fetch in parallel with
+        // the mode-specific leaderboard scores.
+        const [data, dailyData] = await Promise.all([
+            fetchScores(gameMode, date),
+            gameMode !== 'daily' ? fetchScores('daily', date) : Promise.resolve(null),
+        ]);
         $leaderboardSection.style.display = 'block';
         renderLeaderboard($leaderboardContainer, data.scores || [], gameState.totalScore);
-        // Use all-time scores for histogram
-        const histScores = (data.allTimeScores || []).map(s => ({ score: s }));
+        const allTimeScores = ((dailyData ?? data).allTimeScores || []);
+        const histScores = allTimeScores.map(s => ({ score: s }));
         histScores.push({ score: gameState.totalScore }); // include current game
         renderHistogram($histogramCanvas, histScores, gameState.totalScore);
     } catch (err) {
