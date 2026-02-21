@@ -140,12 +140,14 @@
             </div>
         </div>
 
+        <!-- Depth slider (mobile only, shown after guess placed) -->
+        <div id="depth-slider-row" class="depth-slider-row" style="display:none;">
+            <label class="depth-label">Depth:</label>
+            <input type="range" id="depth-slider" min="-500" max="500" value="0" step="1">
+        </div>
+
         <!-- Bottom action bar -->
         <div id="game-actions">
-            <div id="depth-slider-row" class="depth-slider-row" style="display:none;">
-                <label class="depth-label">Depth:</label>
-                <input type="range" id="depth-slider" min="-500" max="500" value="0" step="1">
-            </div>
             <div class="synapse-guess-row">
                 <label class="synapse-label" for="synapse-slider">Synapses:</label>
                 <input type="range" id="synapse-slider" min="0" max="1000" value="500" step="1">
