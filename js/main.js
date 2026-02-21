@@ -372,6 +372,9 @@ function onGuessPlaced(position) {
     // Show depth slider on mobile when guess is placed
     if (window.innerWidth <= 768) {
         $depthSliderRow.style.display = 'flex';
+        // Let the browser reflow so game-actions gets its new height,
+        // then tell the renderer to match the shrunken canvas container.
+        requestAnimationFrame(() => brainViewer._onResize());
     }
 }
 
