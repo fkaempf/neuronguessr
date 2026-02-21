@@ -78,7 +78,7 @@ function generateShareText(date, totalScore, roundScores) {
     const rows = roundScores.map(r =>
         `📍${scoreToBlocks(r.locationScore)} ⚡${scoreToBlocks(r.synapseScore)}`
     ).join('\n');
-    const url = window.location.origin;
+    const url = 'https://floriankaempf.com/neuronguessr';
     return `${header}\n${rows}\n${url}`;
 }
 
