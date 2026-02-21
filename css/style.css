@@ -428,7 +428,10 @@ body {
     display: flex;
     align-items: center;
     gap: 6px;
-    flex: 1 0 100%; /* own line inside the flex-wrap label */
+}
+
+.depth-slider-inline #depth-slider {
+    width: 110px;
 }
 
 .depth-label {
