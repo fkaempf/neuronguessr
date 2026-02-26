@@ -491,8 +491,10 @@ function showFinalScore() {
     `;
     }).join('');
 
-    // Reset leaderboard UI
-    $scoreSubmitRow.style.display = 'flex';
+    // Reset leaderboard UI – hide submit row if daily score already submitted
+    const alreadySubmitted = gameMode === 'daily' && manifest?.date
+        && localStorage.getItem(`daily_submitted_${manifest.date}`);
+    $scoreSubmitRow.style.display = alreadySubmitted ? 'none' : 'flex';
     $btnSubmitScore.disabled = false;
     $btnSubmitScore.textContent = 'Submit Score';
     $leaderboardSection.style.display = 'none';
@@ -572,6 +574,7 @@ async function handleScoreSubmit() {
             $scoreSubmitRow.style.display = 'none';
             // Save daily completion
             if (gameMode === 'daily') {
+                localStorage.setItem(`daily_submitted_${date}`, '1');
                 localStorage.setItem(`daily_played_${date}`, String(gameState.totalScore));
             }
         }

@@ -8,10 +8,15 @@ import { PROXY_BASE } from './config.js';
  * Submit a score to the leaderboard.
  */
 export async function submitScore(mode, date, name, score, roundScores) {
+    let clientId = localStorage.getItem('ng_client_id');
+    if (!clientId) {
+        clientId = crypto.randomUUID();
+        localStorage.setItem('ng_client_id', clientId);
+    }
     const resp = await fetch(`${PROXY_BASE}/api/scores`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ mode, date, name, score, roundScores }),
+        body: JSON.stringify({ mode, date, name, score, roundScores, clientId }),
     });
     return resp.json();
 }

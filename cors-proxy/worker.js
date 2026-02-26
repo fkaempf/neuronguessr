@@ -195,9 +195,10 @@ async function submitScore(request, env) {
     if (typeof score !== 'number' || score < 0 || score > 50000) return corsError('Invalid score');
     if (!Array.isArray(roundScores) || roundScores.length !== 5) return corsError('Invalid roundScores');
 
-    // Rate limit by IP
-    const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
-    const rateKey = `rate:${mode}:${date}:${ip}`;
+    // Rate limit by clientId (generated per browser via crypto.randomUUID)
+    const { clientId } = body;
+    const rateSuffix = clientId && typeof clientId === 'string' ? clientId : (request.headers.get('CF-Connecting-IP') || 'unknown');
+    const rateKey = `rate:${mode}:${date}:${rateSuffix}`;
     const rateCount = parseInt(await env.SCORES.get(rateKey) || '0');
     const maxSubmissions = mode === 'daily' ? 1 : 10;
 
@@ -229,20 +230,34 @@ async function submitScore(request, env) {
     await env.SCORES.put(scoreKey, JSON.stringify(existing), { expirationTtl: ttl });
 
     // Append to all-time histogram (just scores, no names, capped at 10000)
-    const histKey = `histogram:${mode}`;
+    const histKey = `histogram:daily`;
     const allScores = await env.SCORES.get(histKey, 'json') || [];
     allScores.push(score);
     // Keep only last 10000 scores to avoid unbounded growth
     if (allScores.length > 10000) allScores.splice(0, allScores.length - 10000);
     await env.SCORES.put(histKey, JSON.stringify(allScores));
 
+    // For freeplay: maintain persistent all-time leaderboard (no TTL)
+    let rank, total;
+    if (mode === 'freeplay') {
+        const lbKey = 'leaderboard:freeplay';
+        const allTime = await env.SCORES.get(lbKey, 'json') || [];
+        const entry = { name: name.trim(), score, roundScores, timestamp: Date.now() };
+        allTime.push(entry);
+        allTime.sort((a, b) => b.score - a.score);
+        if (allTime.length > 200) allTime.length = 200;
+        await env.SCORES.put(lbKey, JSON.stringify(allTime));
+        rank = allTime.findIndex(e => e.timestamp === entry.timestamp) + 1;
+        total = allTime.length;
+    } else {
+        rank = existing.findIndex(e => e.timestamp === existing[existing.length - 1].timestamp) + 1;
+        total = existing.length;
+    }
+
     // Update rate limit (expires end of day)
     await env.SCORES.put(rateKey, String(rateCount + 1), { expirationTtl: 86400 });
 
-    // Find rank
-    const rank = existing.findIndex(e => e.timestamp === existing[existing.length - 1].timestamp) + 1;
-
-    return corsJson({ success: true, rank, total: existing.length });
+    return corsJson({ success: true, rank, total });
 }
 
 async function getScores(url, env) {
@@ -251,12 +266,13 @@ async function getScores(url, env) {
 
     if (!['daily', 'freeplay'].includes(mode)) return corsError('Invalid mode');
 
-    const scoreKey = `scores:${mode}:${date}`;
-    const scores = await env.SCORES.get(scoreKey, 'json') || [];
+    // Freeplay returns all-time persistent leaderboard; daily returns date-specific
+    const scores = mode === 'freeplay'
+        ? (await env.SCORES.get('leaderboard:freeplay', 'json') || [])
+        : (await env.SCORES.get(`scores:${mode}:${date}`, 'json') || []);
 
-    // All-time histogram scores
-    const histKey = `histogram:${mode}`;
-    const allTimeScores = await env.SCORES.get(histKey, 'json') || [];
+    // All-time histogram always uses the unified daily histogram
+    const allTimeScores = await env.SCORES.get('histogram:daily', 'json') || [];
 
     return corsJson({ mode, date, scores, total: scores.length, allTimeScores });
 }
