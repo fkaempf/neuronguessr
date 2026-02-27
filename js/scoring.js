@@ -2,7 +2,7 @@
  * Scoring module for NeuronGuessr.
  *
  * Location: exponential decay on 3D distance (max 5000).
- * Synapses: exponential decay on log-ratio (max 5000).
+ * Synapses: Gaussian on fourth-root distance (max 5000).
  * Total: 10,000 per round, 50,000 perfect game.
  */
 
@@ -42,20 +42,22 @@ export function computeLocationScore(guess, answer, maxDistance) {
 /**
  * Compute synapse count score.
  *
- * Uses log-ratio so being 2x off costs the same whether the neuron
- * has 100 or 100,000 synapses.
+ * Gaussian on fourth-root distance — absolute synapse count matters.
+ * Being 2x off hurts more on a large neuron than a small one.
  *
- * Formula: 5000 * exp(-1.5 * |ln(guess / actual)|)
- *   exact  -> 5000
- *   2x off -> ~1770
- *   3x off -> ~960
- *   5x off -> ~360
- *   10x off -> ~160
+ * Formula: 5000 * exp(-(|guess^0.25 - actual^0.25| / 3)^2)
+ *
+ *              100 syn   1K syn   10K syn   50K syn
+ *   2x off      4800     4400     3360      2060
+ *   3x off      4480     3520     1650       420
+ *   5x off      3810     2110      330        10
+ *   10x off     2550      600        6         0
  */
 export function computeSynapseScore(guess, actual) {
     if (guess <= 0 || actual <= 0) return { score: 0, ratio: Infinity };
-    const logRatio = Math.abs(Math.log(guess / actual));
-    const score = Math.round(MAX_SYNAPSE_POINTS * Math.exp(-1.5 * logRatio));
+    const diff = Math.abs(Math.pow(guess, 0.25) - Math.pow(actual, 0.25));
+    const k = 3;
+    const score = Math.round(MAX_SYNAPSE_POINTS * Math.exp(-(diff / k) * (diff / k)));
     return { score, ratio: guess / actual };
 }
 

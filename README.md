@@ -2,7 +2,7 @@
 
 A web game inspired by [GeoGuessr](https://www.geoguessr.com/) and [TimeGuessr](https://timeguessr.com/) where you identify neurons in the *Drosophila* (fruit fly) brain. Study a 3D neuron mesh, guess where in the brain it belongs and how many synapses it has.
 
-**[Play now](https://fkaempf.github.io/neuronguessr/)** (requires a free neuPrint API token)
+**[Play now](https://floriankaempf.com/neuronguessr/)**
 
 ## How It Works
 
@@ -16,27 +16,29 @@ A web game inspired by [GeoGuessr](https://www.geoguessr.com/) and [TimeGuessr](
 
 | What | Source | Auth |
 |------|--------|------|
-| Neuron metadata & synapse counts | [neuPrint](https://neuprint.janelia.org) REST API (Cypher queries) | Bearer token (player-provided) |
+| Neuron metadata & synapse counts | Pre-computed from [neuPrint](https://neuprint.janelia.org) (`data/neuron-metadata.json`, 158K neurons) | None (bundled) |
+| Neuron skeletons | [neuPrint](https://neuprint.janelia.org) REST API via Cloudflare Worker proxy | None (worker handles auth) |
 | 3D neuron meshes | [DVID](https://github.com/janelia-flyem/dvid) — neuroglancer `.ngmesh` format | None (public, CORS-enabled) |
 | Brain neuropil meshes | Static OBJ/PLY files from the Male CNS dataset | None (bundled) |
 
-Neuron selection uses type-balanced sampling (random types first, then one random neuron per type) to avoid bias towards the most numerous cell types.
+Neuron selection uses type-balanced sampling (random types first, then one neuron per type) to avoid over-representation of types with many cells (e.g. optic lobe neurons).
 
 ## Tech Stack
 
 - **Three.js** for all 3D rendering (neuron meshes, brain neuropils, guess markers)
 - **Vanilla JS** with ES modules via `<script type="importmap">` — no build step, no framework
-- **Cloudflare Worker** as a CORS proxy for neuPrint (which doesn't serve CORS headers)
+- **Cloudflare Worker** as a skeleton proxy for neuPrint (fetches skeletons using a server-side token — no player auth needed) and scores backend
 - DVID is accessed directly from the browser (it supports CORS natively)
 
 ## Setup (Self-Hosting)
 
-### 1. Deploy the CORS Proxy
+### 1. Deploy the Worker
 
-The `cors-proxy/` directory contains a Cloudflare Worker that proxies neuPrint API requests.
+The `cors-proxy/` directory contains a Cloudflare Worker that proxies neuPrint skeleton requests (using a server-side token) and handles the scores/leaderboard backend.
 
 ```bash
 cd cors-proxy
+wrangler secret put NEUPRINT_TOKEN   # paste your neuPrint API token
 npx wrangler deploy
 ```
 
@@ -71,9 +73,9 @@ python -m http.server 8000
 # Netlify / Vercel: no build command, publish directory: /
 ```
 
-### 4. Get a Token and Play
+### 4. Play
 
-Visit [neuprint.janelia.org/account](https://neuprint.janelia.org/account), sign in with Google, copy the auth token, and paste it on the start screen.
+Open the site — no sign-in or token needed. The worker handles neuPrint auth server-side.
 
 ## Project Structure
 
@@ -82,24 +84,28 @@ index.html              Single-page app entry point
 css/style.css           All styles
 js/
   main.js               Game controller & UI logic
-  auth.js               Token management (session storage)
   brain-viewer.js       3D brain + neuropil viewer (Three.js)
   neuron-viewer.js      3D neuron viewer with scale bar
-  neuprint-client.js    neuPrint REST API client
-  online-data-loader.js Fetches neurons (neuPrint) & meshes (DVID)
+  online-data-loader.js Neuron selection, skeleton fetching & mesh loading
   swc-parser.js         SWC skeleton format parser
   data-loader.js        Static data loader (brain meshes, neuropil config)
   scoring.js            Scoring formulas
   game-state.js         Round/score state management
+  leaderboard.js        Score submission & leaderboard UI
   ui.js                 DOM helpers
   config.js             Deployment config (gitignored)
 cors-proxy/
-  worker.js             Cloudflare Worker CORS proxy
-data/                   Static brain mesh files (OBJ/PLY)
+  worker.js             Cloudflare Worker — skeleton proxy & scores backend
+data/
+  neuron-metadata.json  Pre-computed metadata for 158K neurons (11K types)
+  brain/                Brain mesh files (OBJ/PLY)
+  neuropils/            Neuropil region meshes & config
 assets/                 Static assets
-pipeline/               Scripts to refresh brain mesh data
+pipeline/
+  fetch_metadata_lookup.py  One-time script to regenerate neuron-metadata.json
+  fetch_neurons.py          Script to generate static neuron data files
 ```
 
 ## Data Attribution
 
-Neuron data from the [Male CNS Connectome](https://male-cns.janelia.org/) (Janelia Research Campus), accessed via [neuPrint](https://neuprint.janelia.org) and [DVID](https://emdata-mcns.janelia.org).
+Neuron data from the [Male CNS Connectome](https://male-cns.janelia.org/) (`male-cns:v0.9`, Janelia Research Campus), accessed via [neuPrint](https://neuprint.janelia.org) and [DVID](https://emdata-mcns.janelia.org).
