@@ -188,8 +188,8 @@
             </div>
             <div class="scoring-section">
                 <h3>Synapses <span class="scoring-max">max 5,000 pts</span></h3>
-                <p class="scoring-formula">5000 &times; e<sup>&minus;1.5 &times; |ln(guess / actual)|</sup></p>
-                <p class="scoring-desc">Log-ratio: being 2x off costs the same at 100 or 100,000 synapses</p>
+                <p class="scoring-formula">5000 &times; e<sup>&minus;(|guess<sup>&frac14;</sup> &minus; actual<sup>&frac14;</sup>| / 3)&sup2;</sup></p>
+                <p class="scoring-desc">Absolute count matters: being 2x off hurts more on large neurons</p>
                 <canvas id="chart-synapse" width="400" height="180"></canvas>
             </div>
             <button id="btn-close-scoring" class="btn-primary">Got it</button>

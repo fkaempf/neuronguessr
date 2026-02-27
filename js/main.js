@@ -660,8 +660,16 @@ function drawScoringCharts() {
         ],
     });
 
+    // Show curves for a small (100) and large (10K) neuron
+    const synFn = (actual) => (x) => {
+        const diff = Math.abs(Math.pow(x * actual, 0.25) - Math.pow(actual, 0.25));
+        return 5000 * Math.exp(-(diff / 3) * (diff / 3));
+    };
     drawChart('chart-synapse', {
-        fn: (x) => 5000 * Math.exp(-1.5 * Math.abs(Math.log(x))),
+        fn: synFn(1000),
+        fn2: synFn(10000),
+        fn2Label: '10K syn',
+        fnLabel: '1K syn',
         xMin: 0.1,
         xMax: 15,
         xLabel: 'Guess / Actual ratio',
@@ -750,6 +758,49 @@ function drawChart(canvasId, opts) {
         else ctx.lineTo(cx, cy);
     }
     ctx.stroke();
+
+    // Optional second curve (dimmer)
+    if (opts.fn2) {
+        const color2 = '#FF9800';
+        ctx.strokeStyle = color2;
+        ctx.lineWidth = 2;
+        ctx.setLineDash([6, 4]);
+        ctx.beginPath();
+        for (let i = 0; i <= steps; i++) {
+            let x;
+            if (opts.logX) {
+                x = xMin * Math.pow(xMax / xMin, i / steps);
+            } else {
+                x = xMin + (xMax - xMin) * (i / steps);
+            }
+            const y = opts.fn2(x);
+            const cx2 = toCanvasX(x);
+            const cy2 = toCanvasY(Math.max(0, Math.min(yMax, y)));
+            if (i === 0) ctx.moveTo(cx2, cy2);
+            else ctx.lineTo(cx2, cy2);
+        }
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // Legend
+        const lx = pad.left + 8;
+        const ly = pad.top + 8;
+        ctx.font = '10px system-ui';
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'top';
+        // First curve
+        ctx.strokeStyle = opts.color;
+        ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(lx, ly + 5); ctx.lineTo(lx + 16, ly + 5); ctx.stroke();
+        ctx.fillStyle = '#ccc';
+        ctx.fillText(opts.fnLabel || 'fn1', lx + 20, ly);
+        // Second curve
+        ctx.strokeStyle = color2;
+        ctx.setLineDash([6, 4]);
+        ctx.beginPath(); ctx.moveTo(lx, ly + 19); ctx.lineTo(lx + 16, ly + 19); ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.fillText(opts.fn2Label || 'fn2', lx + 20, ly + 14);
+    }
 
     // Reference points with dots and labels
     ctx.fillStyle = opts.color;
