@@ -2,7 +2,7 @@
  * Cloudflare Worker — CORS proxy + backend for NeuronGuessr.
  *
  * Routes:
- *   /api/daily              GET  — today's 5 daily challenge neurons
+ *   /api/skeleton/:bodyId   GET  — fetch neuron skeleton (uses worker's token)
  *   /api/scores             POST — submit a score
  *   /api/scores?mode=&date= GET  — fetch leaderboard
  *   /api/*                  *    — CORS proxy to neuprint.janelia.org
@@ -32,150 +32,29 @@ function corsError(msg, status = 400) {
     return corsJson({ error: msg }, status);
 }
 
-// ---------- Seeded PRNG (mulberry32) ----------
+// ---------- Skeleton proxy ----------
 
-function mulberry32(seed) {
-    return function () {
-        seed |= 0; seed = seed + 0x6D2B79F5 | 0;
-        let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
-        t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
-        return ((t ^ t >>> 14) >>> 0) / 4294967296;
-    };
-}
-
-function hashString(str) {
-    let h = 0;
-    for (let i = 0; i < str.length; i++) {
-        h = Math.imul(31, h) + str.charCodeAt(i) | 0;
-    }
-    return h;
-}
-
-function seededShuffle(arr, rng) {
-    const a = [...arr];
-    for (let i = a.length - 1; i > 0; i--) {
-        const j = Math.floor(rng() * (i + 1));
-        [a[i], a[j]] = [a[j], a[i]];
-    }
-    return a;
-}
-
-// ---------- Daily Challenge ----------
-
-function todayUTC() {
-    return new Date().toISOString().split('T')[0];
-}
-
-async function getDailyNeurons(env) {
-    const date = todayUTC();
-    const cacheKey = `daily:${date}:neurons`;
-
-    // Check cache
-    const cached = await env.SCORES.get(cacheKey, 'json');
-    if (cached) return { date, neurons: cached };
-
-    // Query neuPrint for a large pool of types
+/**
+ * Fetch a neuron skeleton from neuPrint using the worker's own token.
+ * Clients don't need their own token — the worker handles auth.
+ */
+async function fetchSkeleton(bodyId, env) {
     const token = env.NEUPRINT_TOKEN;
     if (!token) throw new Error('NEUPRINT_TOKEN secret not configured');
 
-    const cypher = `
-        MATCH (n:Neuron)
-        WHERE n.status = "Traced"
-          AND n.pre >= 20
-          AND n.post >= 20
-          AND n.type IS NOT NULL
-        WITH DISTINCT n.type AS t
-        RETURN t
-    `;
-
-    const resp = await fetch(`${UPSTREAM}/api/custom/custom`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify({ cypher, dataset: DATASET }),
-    });
+    const resp = await fetch(
+        `${UPSTREAM}/api/skeletons/skeleton/${DATASET}/${bodyId}`,
+        { headers: { 'Authorization': `Bearer ${token}` } }
+    );
     if (!resp.ok) {
         const text = await resp.text();
-        throw new Error(`neuPrint query failed (${resp.status}): ${text}`);
+        throw new Error(`Skeleton fetch failed for ${bodyId}: ${resp.status} ${text}`);
     }
+    return resp.json();
+}
 
-    const result = await resp.json();
-    const allTypes = result.data.map(row => row[0]);
-
-    // Deterministically pick 5 types using date-seeded PRNG
-    const rng = mulberry32(hashString(date));
-    const shuffled = seededShuffle(allTypes, rng);
-    const selectedTypes = shuffled.slice(0, 5);
-
-    // For each type, pick one neuron (also deterministic)
-    const neurons = [];
-    for (const type of selectedTypes) {
-        const q = `
-            MATCH (m:Neuron)
-            WHERE m.type = "${type.replace(/"/g, '\\"')}"
-              AND m.status = "Traced"
-              AND m.pre >= 20
-              AND m.post >= 20
-            RETURN m.bodyId AS bodyId,
-                   m.type AS type,
-                   m.instance AS instance,
-                   m.pre AS pre,
-                   m.post AS post,
-                   m.somaLocation AS somaLocation,
-                   m.roiInfo AS roiInfo
-            LIMIT 20
-        `;
-        const r = await fetch(`${UPSTREAM}/api/custom/custom`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`,
-            },
-            body: JSON.stringify({ cypher: q, dataset: DATASET }),
-        });
-        if (!r.ok) continue;
-        const res = await r.json();
-        if (!res.data || res.data.length === 0) continue;
-
-        const cols = res.columns;
-        const idx = {};
-        cols.forEach((c, i) => idx[c] = i);
-
-        // Deterministically pick one from results
-        const pick = Math.floor(rng() * res.data.length);
-        const row = res.data[pick];
-
-        const roiInfo = row[idx.roiInfo];
-        let primaryRoi = '';
-        if (roiInfo && typeof roiInfo === 'object') {
-            let maxSyn = 0;
-            for (const [roi, counts] of Object.entries(roiInfo)) {
-                const total = (counts.pre || 0) + (counts.post || 0);
-                if (total > maxSyn) { maxSyn = total; primaryRoi = roi; }
-            }
-        }
-
-        neurons.push({
-            bodyId: row[idx.bodyId],
-            type: row[idx.type] || 'unknown',
-            instance: row[idx.instance] || '',
-            pre: row[idx.pre] || 0,
-            post: row[idx.post] || 0,
-            somaLocation: row[idx.somaLocation],
-            region: primaryRoi,
-        });
-    }
-
-    if (neurons.length < 5) {
-        throw new Error(`Only got ${neurons.length} neurons for daily challenge`);
-    }
-
-    // Cache for 48 hours
-    await env.SCORES.put(cacheKey, JSON.stringify(neurons), { expirationTtl: 172800 });
-
-    return { date, neurons };
+function todayUTC() {
+    return new Date().toISOString().split('T')[0];
 }
 
 // ---------- Scores ----------
@@ -290,10 +169,11 @@ export default {
 
         // --- Custom endpoints ---
 
-        // Daily challenge neurons
-        if (url.pathname === '/api/daily' && request.method === 'GET') {
+        // Skeleton proxy — fetch from neuPrint using worker's token
+        const skelMatch = url.pathname.match(/^\/api\/skeleton\/(\d+)$/);
+        if (skelMatch && request.method === 'GET') {
             try {
-                const data = await getDailyNeurons(env);
+                const data = await fetchSkeleton(skelMatch[1], env);
                 return corsJson(data);
             } catch (err) {
                 return corsError(err.message, 500);

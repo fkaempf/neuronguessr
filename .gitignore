@@ -15,6 +15,9 @@ Thumbs.db
 dist/
 .cache/
 
+# Pipeline venv
+pipeline/.venv/
+
 # Logs
 *.log
 

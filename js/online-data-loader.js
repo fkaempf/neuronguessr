@@ -1,13 +1,12 @@
 /**
- * Online data loader for NeuronGuessr.
+ * Data loader for NeuronGuessr.
  *
- * Drop-in replacement for data-loader.js functions when in online mode.
- * Queries neuPrint live for random neurons instead of loading static files.
- *
- * Brain meshes are still loaded from static files (they don't change).
+ * Loads neuron metadata from data/neuron-metadata.json (pre-computed lookup
+ * of all game-eligible neurons in the dataset). Skeletons are fetched from
+ * neuPrint via the worker's /api/skeleton/:bodyId endpoint (no user token
+ * needed). 3D meshes come from DVID (public, no auth).
  */
 
-import { queryRandomNeurons, fetchSkeleton, setToken } from './neuprint-client.js';
 import { parseSkeletonToNeuron } from './swc-parser.js';
 import { PROXY_BASE, DVID_BASE, DVID_NODE } from './config.js';
 
@@ -18,75 +17,155 @@ const BRAIN_BOUNDS = {
 };
 const MAX_DISTANCE = 166501.67;
 
-/**
- * Generate a manifest by querying neuPrint for random neurons.
- *
- * @param {string} token - Auth token (neuPrint API token or Google JWT)
- * @param {number} poolSize - How many neurons to query (default 30)
- * @returns {Promise<Object>} - Manifest-shaped object compatible with GameState
- */
-export async function loadOnlineManifest(token, poolSize = 30) {
-    setToken(token);
-
-    const neurons = await queryRandomNeurons(poolSize);
-
-    const manifestNeurons = neurons.map(n => ({
-        file: `online_${n.bodyId}`,  // synthetic key for GameState dedup
-        bodyId: n.bodyId,
-        id: n.bodyId,
-        type: n.type,
-        region: n.region,
-        nodeCount: 0,    // unknown until skeleton fetched
-        _metadata: n,     // full metadata for skeleton parsing
-    }));
-
-    return {
-        count: manifestNeurons.length,
-        neurons: manifestNeurons,
-        brainBounds: BRAIN_BOUNDS,
-        maxDistance: MAX_DISTANCE,
-    };
-}
+// Cached metadata (loaded once, reused across games)
+let _metadataCache = null;
+// Type → best neuron index (built once from metadata)
+let _typeIndex = null;
 
 /**
- * Load the daily challenge manifest from the backend.
- *
- * @param {string} token - Auth token for skeleton/mesh fetching
- * @returns {Promise<Object>} - Manifest-shaped object
+ * Load and cache the neuron metadata lookup.
+ * @returns {Promise<Object>} - { count, typeCount, types, neurons }
  */
-export async function loadDailyManifest(token) {
-    setToken(token);
+async function getMetadata() {
+    if (_metadataCache) return _metadataCache;
+    const resp = await fetch('data/neuron-metadata.json');
+    if (!resp.ok) throw new Error(`Failed to load neuron metadata: ${resp.status}`);
+    _metadataCache = await resp.json();
 
-    const resp = await fetch(`${PROXY_BASE}/api/daily`);
-    if (!resp.ok) {
-        const text = await resp.text();
-        throw new Error(`Daily challenge failed (${resp.status}): ${text}`);
+    // Build type → {bodyId, ...meta} index (one per type, highest synapse count)
+    _typeIndex = {};
+    for (const [bodyId, meta] of Object.entries(_metadataCache.neurons)) {
+        const t = meta.type;
+        const total = (meta.pre || 0) + (meta.post || 0);
+        if (!_typeIndex[t] || total > (_typeIndex[t].pre || 0) + (_typeIndex[t].post || 0)) {
+            _typeIndex[t] = { bodyId: parseInt(bodyId), ...meta };
+        }
     }
 
-    const { date, neurons } = await resp.json();
+    return _metadataCache;
+}
 
-    const manifestNeurons = neurons.map(n => ({
-        file: `daily_${date}_${n.bodyId}`,
-        bodyId: n.bodyId,
-        id: n.bodyId,
-        type: n.type,
-        region: n.region,
+// ---------- Seeded PRNG (mulberry32) — for deterministic daily selection ----------
+
+function mulberry32(seed) {
+    return function () {
+        seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+        let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+        t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+        return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+}
+
+function hashString(str) {
+    let h = 0;
+    for (let i = 0; i < str.length; i++) {
+        h = Math.imul(31, h) + str.charCodeAt(i) | 0;
+    }
+    return h;
+}
+
+function seededShuffle(arr, rng) {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(rng() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+}
+
+// ---------- Manifest builders ----------
+
+/**
+ * Build a manifest-shaped object from selected neuron entries.
+ */
+function buildManifest(entries, date = null) {
+    const manifestNeurons = entries.map(e => ({
+        file: `meta_${e.bodyId}`,
+        bodyId: e.bodyId,
+        id: e.bodyId,
+        type: e.type,
+        region: e.region,
         nodeCount: 0,
-        _metadata: n,
+        _metadata: e,
     }));
 
-    return {
+    const result = {
         count: manifestNeurons.length,
         neurons: manifestNeurons,
         brainBounds: BRAIN_BOUNDS,
         maxDistance: MAX_DISTANCE,
-        date,
     };
+    if (date) result.date = date;
+    return result;
 }
 
 /**
- * Fetch and parse a single neuron by body ID from neuPrint.
- * Also attempts to fetch the 3D mesh from DVID (falls back to skeleton-only).
+ * Pick neurons from the pre-built type index for a given type list.
+ */
+function pickNeuronsFromTypes(types) {
+    const entries = [];
+    for (const type of types) {
+        const entry = _typeIndex[type];
+        if (entry) entries.push(entry);
+    }
+    return entries;
+}
+
+/**
+ * Load the daily challenge manifest. Uses date-seeded PRNG to pick the
+ * same 5 neurons for everyone on a given day.
+ *
+ * @returns {Promise<Object>} - Manifest-shaped object
+ */
+export async function loadDailyManifest() {
+    const metadata = await getMetadata();
+    const date = new Date().toISOString().split('T')[0];
+
+    const rng = mulberry32(hashString(date));
+    const shuffled = seededShuffle(metadata.types, rng);
+    const selectedTypes = shuffled.slice(0, 5);
+
+    const entries = pickNeuronsFromTypes(selectedTypes);
+    if (entries.length < 5) {
+        throw new Error(`Only resolved ${entries.length}/5 daily neurons`);
+    }
+
+    return buildManifest(entries, date);
+}
+
+/**
+ * Load a free play manifest. Picks random neuron types from the metadata.
+ *
+ * @param {number} poolSize - How many neurons to include (default 30)
+ * @returns {Promise<Object>} - Manifest-shaped object
+ */
+export async function loadFreeplayManifest(poolSize = 30) {
+    const metadata = await getMetadata();
+
+    // Shuffle types randomly and pick a pool
+    const shuffled = [...metadata.types].sort(() => Math.random() - 0.5);
+    const selectedTypes = shuffled.slice(0, poolSize);
+
+    const entries = pickNeuronsFromTypes(selectedTypes);
+    return buildManifest(entries);
+}
+
+// ---------- Single neuron loading ----------
+
+/**
+ * Fetch a neuron skeleton via the worker's proxy (no user token needed).
+ */
+async function fetchSkeletonViaProxy(bodyId) {
+    const resp = await fetch(`${PROXY_BASE}/api/skeleton/${bodyId}`);
+    if (!resp.ok) {
+        throw new Error(`Skeleton fetch failed for ${bodyId}: ${resp.status}`);
+    }
+    return resp.json();
+}
+
+/**
+ * Fetch and parse a single neuron by body ID.
+ * Skeleton comes from the worker proxy; mesh from DVID (public).
  *
  * @param {Object} neuronEntry - Entry from manifest.neurons (has bodyId and _metadata)
  * @returns {Promise<Object>} - Neuron data matching the app's interface
@@ -94,7 +173,7 @@ export async function loadDailyManifest(token) {
 export async function loadOnlineNeuron(neuronEntry) {
     // Fetch skeleton and mesh in parallel
     const [skeletonResp, meshData] = await Promise.all([
-        fetchSkeleton(neuronEntry.bodyId),
+        fetchSkeletonViaProxy(neuronEntry.bodyId),
         fetchNeuronMesh(neuronEntry.bodyId),
     ]);
 
@@ -120,12 +199,11 @@ export async function loadOnlineNeuron(neuronEntry) {
     return neuronData;
 }
 
+// ---------- DVID mesh loading ----------
+
 /**
  * Fetch a neuron mesh from DVID in neuroglancer .ngmesh format.
  * Returns null if mesh is not available.
- *
- * @param {number} bodyId
- * @returns {Promise<{vertices: Float32Array, indices: Uint32Array}|null>}
  */
 async function fetchNeuronMesh(bodyId) {
     try {

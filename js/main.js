@@ -8,8 +8,7 @@ import { BrainViewer } from './brain-viewer.js';
 import { GameState, ROUNDS_PER_GAME } from './game-state.js';
 import { MAX_POINTS } from './scoring.js';
 import { loadNeuropilConfig, loadOBJText } from './data-loader.js';
-import { initAuth, isSignedIn, getToken, getUserEmail, setManualToken, signOut, onAuthChange } from './auth.js';
-import { loadOnlineManifest, loadDailyManifest, loadOnlineNeuron } from './online-data-loader.js';
+import { loadDailyManifest, loadFreeplayManifest, loadOnlineNeuron } from './online-data-loader.js';
 import { submitScore, fetchScores, renderLeaderboard, renderHistogram } from './leaderboard.js';
 import { showScreen, animateScore } from './ui.js';
 
@@ -164,13 +163,6 @@ const $leaderboardSection = document.getElementById('leaderboard-section');
 const $leaderboardContainer = document.getElementById('leaderboard-container');
 const $histogramCanvas = document.getElementById('histogram-canvas');
 
-// Auth DOM refs
-const $authNotSignedIn = document.getElementById('auth-not-signed-in');
-const $authSignedIn = document.getElementById('auth-signed-in');
-const $authEmail = document.getElementById('auth-email');
-const $neuprintToken = document.getElementById('neuprint-token');
-const $btnSetToken = document.getElementById('btn-set-token');
-const $btnSignOut = document.getElementById('btn-sign-out');
 
 // --- Initialization ---
 async function init() {
@@ -195,10 +187,7 @@ async function init() {
 
         brainViewer.resetCamera();
 
-        // Initialize auth and update UI
-        initAuth();
-        onAuthChange(updateAuthUI);
-        updateAuthUI();
+        updateStartScreenUI();
 
         showScreen('screen-start');
     } catch (err) {
@@ -207,20 +196,9 @@ async function init() {
     }
 }
 
-function updateAuthUI() {
-    if (isSignedIn()) {
-        $authNotSignedIn.style.display = 'none';
-        $authSignedIn.style.display = 'flex';
-        $authEmail.textContent = getUserEmail() || '';
-        $btnDaily.disabled = false;
-        $btnFreeplay.disabled = false;
-    } else {
-        $authNotSignedIn.style.display = 'block';
-        $authSignedIn.style.display = 'none';
-        $authEmail.textContent = '';
-        $btnDaily.disabled = true;
-        $btnFreeplay.disabled = true;
-    }
+function updateStartScreenUI() {
+    $btnDaily.disabled = false;
+    $btnFreeplay.disabled = false;
 
     // Show today's date on daily button
     const today = new Date().toISOString().split('T')[0];
@@ -320,26 +298,17 @@ function showStoredDailyResult(stored) {
 async function startGame(mode = 'daily') {
     gameMode = mode;
     showScreen('screen-loading');
-
-    if (mode === 'daily') {
-        $loadingText.textContent = 'Loading daily challenge...';
-    } else {
-        $loadingText.textContent = 'Querying neuPrint for neurons...';
-    }
+    $loadingText.textContent = mode === 'daily'
+        ? 'Loading daily challenge...'
+        : 'Loading neurons...';
 
     try {
         manifest = mode === 'daily'
-            ? await loadDailyManifest(getToken())
-            : await loadOnlineManifest(getToken());
+            ? await loadDailyManifest()
+            : await loadFreeplayManifest();
     } catch (err) {
         console.error('Failed to load manifest:', err);
-        const isAuth = err.message && (err.message.includes('401') || err.message.includes('jwt') || err.message.includes('credentials'));
-        if (isAuth) {
-            $loadingText.textContent = 'Token expired or invalid. Please sign in again.';
-            signOut();
-        } else {
-            $loadingText.textContent = `Error: ${err.message}`;
-        }
+        $loadingText.textContent = `Error: ${err.message}`;
         await new Promise(r => setTimeout(r, 2500));
         showScreen('screen-start');
         return;
@@ -362,20 +331,12 @@ async function loadRound() {
         _preloadRound = -1;
     } else {
         showScreen('screen-loading');
-        $loadingText.textContent = `Fetching neuron ${neuronMeta.bodyId}...`;
+        $loadingText.textContent = 'Loading neuron...';
         try {
             currentNeuronData = await loadOnlineNeuron(neuronMeta);
         } catch (err) {
-            console.error(`Failed to load neuron ${neuronMeta.bodyId}:`, err);
-            const isAuth = err.message && (err.message.includes('401') || err.message.includes('jwt') || err.message.includes('credentials'));
-            if (isAuth) {
-                $loadingText.textContent = 'Token expired or invalid. Please sign in again.';
-                signOut();
-                await new Promise(r => setTimeout(r, 2500));
-                showScreen('screen-start');
-                return;
-            }
-            $loadingText.textContent = 'Failed to load neuron. Retrying...';
+            console.error('Failed to load neuron:', err);
+            $loadingText.textContent = 'Failed to load neuron.';
             throw err;
         }
     }
@@ -601,7 +562,7 @@ $btnSubmit.addEventListener('click', submitGuess);
 $btnNext.addEventListener('click', nextRound);
 $btnReplay.addEventListener('click', () => {
     showScreen('screen-start');
-    updateAuthUI();
+    updateStartScreenUI();
 });
 $btnShare.addEventListener('click', async () => {
     const today = new Date().toISOString().split('T')[0];
@@ -632,21 +593,6 @@ $btnShareStart.addEventListener('click', async () => {
 $btnSubmitScore.addEventListener('click', handleScoreSubmit);
 $playerName.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') handleScoreSubmit();
-});
-
-// Auth event listeners
-$btnSetToken.addEventListener('click', () => {
-    setManualToken($neuprintToken.value);
-    $neuprintToken.value = '';
-});
-$neuprintToken.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') {
-        setManualToken($neuprintToken.value);
-        $neuprintToken.value = '';
-    }
-});
-$btnSignOut.addEventListener('click', () => {
-    signOut();
 });
 
 $btnToggleOrtho.addEventListener('click', () => {

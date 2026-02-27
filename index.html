@@ -36,30 +36,6 @@
                     <span class="info-label">Perfect score</span>
                 </div>
             </div>
-            <div id="auth-section" class="auth-section">
-                <div id="auth-not-signed-in" class="token-tutorial">
-                    <p class="tutorial-intro">
-                        This game uses live neuron data from
-                        <a href="https://neuprint.janelia.org" target="_blank" rel="noopener">neuPrint</a>,
-                        a database of the <em>Drosophila</em> connectome. You'll need a free API token to play.
-                    </p>
-                    <ol class="tutorial-steps">
-                        <li>Go to <a href="https://neuprint.janelia.org/account" target="_blank" rel="noopener">neuprint.janelia.org/account</a> and sign in with Google</li>
-                        <li>Copy the <strong>AUTH_TOKEN</strong> shown on the page</li>
-                        <li>Paste it below</li>
-                    </ol>
-                    <div class="token-input-row">
-                        <input type="password" id="neuprint-token" placeholder="Paste your neuPrint API token" class="token-input">
-                        <button id="btn-set-token" class="btn-token-set">Set Token</button>
-                    </div>
-                </div>
-                <div id="auth-signed-in" class="auth-status" style="display:none;">
-                    <span class="auth-badge">Authenticated</span>
-                    <span id="auth-email" class="auth-email"></span>
-                    <button id="btn-sign-out" class="btn-link">Sign out</button>
-                </div>
-            </div>
-
             <div class="mode-selector" id="mode-selector">
                 <button id="btn-daily" class="btn-mode" disabled>
                     <span class="mode-title">Daily Challenge</span>
@@ -77,16 +53,13 @@
             </div>
 
             <button id="btn-scoring" class="btn-link">How Scoring Works</button>
-            <p class="privacy-note">
-                Your API token is sent only to neuPrint (via our <a href="https://github.com/fkaempf/neuronguessr/blob/main/cors-proxy/worker.js" target="_blank" rel="noopener">open-source CORS proxy</a>) and stored in your browser's local storage. It is never logged or shared.
-            </p>
             <p class="credit">
                 Data: <em>Drosophila</em> Male CNS Connectome via <a href="https://neuprint.janelia.org" target="_blank" rel="noopener">neuPrint</a> &amp; <a href="https://github.com/janelia-flyem/dvid" target="_blank" rel="noopener">DVID</a>
                 <button id="btn-info-toggle" class="info-toggle" aria-label="Show tech info" title="Tech info">i</button>
             </p>
             <div id="tech-stack" class="tech-stack" style="display:none;">
                 3D neuron meshes from <a href="https://github.com/janelia-flyem/dvid" target="_blank" rel="noopener">DVID</a> (neuroglancer precomputed format) &middot;
-                Synapse counts &amp; metadata queried live from <a href="https://neuprint.janelia.org" target="_blank" rel="noopener">neuPrint</a> via Cypher &middot;
+                Synapse counts &amp; metadata from <a href="https://neuprint.janelia.org" target="_blank" rel="noopener">neuPrint</a> &middot;
                 Brain neuropil meshes from static OBJ/PLY files &middot;
                 Rendered with <a href="https://threejs.org" target="_blank" rel="noopener">Three.js</a> &middot; Vanilla JS &middot; No build step
             </div>
